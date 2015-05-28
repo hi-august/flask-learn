@@ -1,3 +1,2 @@
 # flaskdemo
 flask exercises
-exercises

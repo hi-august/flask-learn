@@ -1,4 +1,10 @@
-<title>user page</title>
+{% if title %}
+<title> {{ tdk.title }} </title>
+{% else %}
+<title> welcome to title </title>
+{% endif %}
+<meta name='keywords' content='{{ tdk.keywords}}'
+<meta name='description' content='{{ tdk.description}}' />
 {% if username %}
 <h3> welcome back! {{username}} </h3>
 {% else %}

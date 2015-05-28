@@ -4,12 +4,14 @@
 '''
 from flask import Flask
 from flask import *
+import pdb
 app = Flask(__name__)
 
 @app.route('/hello/')
 #def hello_world():pass
 @app.route('/hello/<name>')
 def hello(name=None):
+    pdb.set_trace()
     return render_template('hello.html', name=name)
 
 @app.route('/') # 绑定路由,即访问浏览器入口
@@ -31,7 +33,8 @@ def register():
 @app.route('/user/')
 @app.route('/user/<username>') # <username>是变量
 def show_user_profile(username=None):
-    return render_template('user.html',username = username)
+    tdk = {'title':'user page','keywords':'user page keywords', 'description':'user page description'}
+    return render_template('user.html',username = username,tdk = tdk)
 
 @app.route('/post/<int:post_id>')
 def show_post(post_id):
