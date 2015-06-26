@@ -46,8 +46,8 @@ def about():
 
 @app.route('/projects/')
 def projects():
-    return 'projects page'
+    return render_template('projects.html')
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(host='192.168.0.103')
+    app.run(host='127.0.0.2')
