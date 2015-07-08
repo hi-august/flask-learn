@@ -1,0 +1,9 @@
+{% if title %}
+<title> {{title}} </title>
+{% else %}
+<title> not title </title>
+{% endif %}
+
+{% for n in username %}
+<h3> {{n.username}} </h3>
+{% endfor %}

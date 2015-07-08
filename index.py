@@ -4,15 +4,8 @@
 '''
 from flask import Flask
 from flask import *
-import pdb
 app = Flask(__name__)
 
-@app.route('/hello/')
-#def hello_world():pass
-@app.route('/hello/<name>')
-def hello(name=None):
-    pdb.set_trace()
-    return render_template('hello.html', name=name)
 
 @app.route('/') # 绑定路由,即访问浏览器入口
 def index():
@@ -25,6 +18,13 @@ def login():
     else:
         return 'please login in'
         # show_the_login_form()
+
+@app.route('/hello/')
+#def hello_world():pass
+@app.route('/hello/<name>')
+def hello(name=None):
+    return render_template('hello.html', name=name)
+
 
 @app.route('/register')
 def register():

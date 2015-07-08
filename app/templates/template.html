@@ -1,0 +1,26 @@
+模版中的流程控制
+if
+
+{% if title %}
+<title> {{title}} </title>
+{% else %}
+<title> not title </title>
+{% endif %}
+
+使用循环
+for
+
+{% for post in posts %}
+<li>
+{{post.author.nickname}}
+<li>
+<p>
+{{post.body}}
+</p>
+{% endfor %}
+
+模版继承
+{% extends "base.html" %}
+
+<h1> template page </h1>
+<h2> {{user.username}} </h2>
