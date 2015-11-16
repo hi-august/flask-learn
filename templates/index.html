@@ -1,0 +1,8 @@
+index page 
+{% if movies %} 
+{% for movie in movies %}
+<h3><a href="{{movie.link}}" title="">{{movie.title}}</a>--update: {{movie.entry_time}} --rate: {{movie.rating}}<h3>
+{% endfor %}
+{% else %}
+  <h1>Hello World!</h1>
+{% endif %}
