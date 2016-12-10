@@ -1,0 +1,21 @@
+# Ignore files
+*.zip
+*.png
+*.gif
+*.jpeg
+*.jpg
+*.py[cod]
+*.swp
+*.log
+*.txt
+# OS gen files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+
