@@ -5,13 +5,19 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 from flask import Flask
+from flask.ext.login import LoginManager
+
 from config import config_mapping
+
 import logging
 from logging.handlers import SysLogHandler
 from logging import Formatter, StreamHandler, FileHandler
 
 from flask.ext.mongoengine import MongoEngine
+
 db = MongoEngine()
+
+login_manager = LoginManager()
 
 config_name = "%s_%s" % (os.getenv('FLASK_SERVER') or 'api', os.getenv('FLASK_CONFIG') or 'local')
 config = config_mapping[config_name]
@@ -50,6 +56,7 @@ def init_logging(app, server_type):
 def setup_app():
     servers = {
         'api': setup_api_app,
+        'dashboard': setup_dashboard_app,
     }
     server_type = config_name.split("_")[0]
     app = servers[server_type]()
@@ -57,6 +64,20 @@ def setup_app():
     return app
 
 
+
+def setup_dashboard_app():
+    app = Flask(__name__)
+    app.config.from_object(config)
+    config.init_app(app)
+    print('run in dashboard server, use %s' %config.__name__)
+
+    db.init_app(app)
+    login_manager.init_app(app)
+    from dashboard import dashboard as dashboard_blueprint
+    app.register_blueprint(dashboard_blueprint)
+    app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+
+    return app
 
 def setup_api_app():
     app = Flask(__name__)

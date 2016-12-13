@@ -74,18 +74,23 @@ class ApiLocalConfig(Config):
     pass
 
 class ApiDevConfig(Config):
+    DEBUG = True
     pass
 
 class ApiProdConfig(Config):
+    DEBUG = True
     pass
 
 class AdminLocalConfig(Config):
+    DEBUG = True
     pass
 
 class AdminDevConfig(Config):
+    DEBUG = True
     pass
 
 class AdminProdConfig(Config):
+    DEBUG = True
     pass
 
 config_mapping = {
