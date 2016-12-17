@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>new page</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='dashboard/css/bootstrap.min.css')}}" />
+    <style type="text/css">
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class='row clearfix'>
+        <div class='col-md-12 column'>
+          <div class='row clearfix'>
+            <div class='col-md-2 column'>
+            </div>
+            <div class='col-md-8 column'>
+              <h3>简书热点</h3>
+            </div>
+            <div class='col-md-22 column'>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row clearfix">
+        <div class="col-md-12 column">
+          <div class="row">
+            <div class="col-md-2 column">
+            </div>
+            <div class="col-md-8 column">
+              {% if news.items %}
+    {% for new in news.items %}
+    <h4><a href="{{url_for('dashboard.get_news_list')}}/{{new.url.split('/')[-1]}}">{{new.title}}</a> -- {{new.author}}</h4>
+    {% else %}
+    No news
+    {% endfor %}
+    {% endif %}
+            </div>
+            <div class="col-md-2 column">
+            </div>
+        </div>
+      </div>
+
+        <nav style="text-align: center">
+            <ul class="pagination">
+                <li>
+                  {% if news.prev_num %}
+                  <a href="{{ url_for('dashboard.get_news_list', page=news.prev_num)}}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                  {% endif %}
+                </li>
+                  {% for page in news.iter_pages() %}
+                  <li> <a href='{{ url_for('dashboard.get_news_list', page=page)}}'>{{ page }}</a></li>
+                  {% endfor %}
+                <li>
+                    {% if news.has_next %}
+                    <a href="{{ url_for('dashboard.get_news_list', page=news.next_num)}}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                    {% endif %}
+                </li>
+            </ul>
+        </nav>
+
+      </div>
+    </div>
+
+
+  <script type='text/javascript'>
+  </script>
+
+</body>
+</html>

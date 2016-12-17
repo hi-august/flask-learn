@@ -47,7 +47,7 @@ class Config:
     CELERY_SENTRY_DSN = ""
 
     MONGODB_SETTINGS = {
-        'db': 'web12308',
+        'db': 'web',
         'host': 'localhost',
         'port': 27017,
     }

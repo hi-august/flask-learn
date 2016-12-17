@@ -85,6 +85,7 @@ def setup_api_app():
     config.init_app(app)
     print('run in api server, use %s' %config.__name__)
 
+    login_manager.init_app(app)
     db.init_app(app)
     from api import api as main_blueprint
     app.register_blueprint(main_blueprint)

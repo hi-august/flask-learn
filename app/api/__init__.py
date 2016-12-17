@@ -5,7 +5,7 @@ from app import access_log
 
 api = Blueprint('api', __name__)
 
-import errors, view2
+import errors, views, auth
 
 @api.before_request
 def log_request():

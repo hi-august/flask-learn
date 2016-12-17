@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>new page</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='dashboard/css/bootstrap.min.css')}}" />
+    <script type="text/javascript" src="{{url_for('static', filename='dashboard/js/jquery-2.2.3.min.js')}}"></script>
+    <style type="text/css">
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class='row clearfix'>
+        <div class='col-md-12 column'>
+          <div class='row clearfix'>
+            <div class='col-md-2 column'>
+            </div>
+            <div class='col-md-8 column'>
+              <p>
+              <input type=text size=5 name=a> +
+                  <input type=text size=5 name=b> =
+                      <span id=result>?</span>
+              </p>
+              <p>
+              <input type="button" id="calculate" value="计算"></input>
+              </p>
+              <p>
+              <input type=text size=5 name=a1> +
+                  <input type=text size=5 name=b1> =
+                      <span id=result1>?</span>
+              </p>
+              <p>
+              <input type="button" id="calculate1" value="计算1"></input>
+              </p>
+              <h3 class='title'><h3>
+              <p class='author'></p>
+              <p> 来源: <a href='' class='url'></a></p>
+            </div>
+            <div class='col-md-2 column'>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class='row clearfix'>
+        <div class='col-md-12 column'>
+          <div class='row clearfix'>
+            <div class='col-md-2 column'>
+            </div>
+            <div class='col-md-8 column'>
+              <p class='content'></p>
+              </p>
+            </div>
+            <div class='col-md-2 column'>
+            </div>
+          </div>
+        </div>
+      </div>
+    <div class='row clearfix'>
+      <div class='col-md-2 column'>
+        </div>
+      <div class='col-md-8 column'>
+        <p>
+          <a href="javascript:;" class="add-remark" pk="">备注</a><br/>
+        </p>
+        </div>
+      <div class='col-md-2 column'>
+        </div>
+    </div>
+    </div>
+  </body>
+
+<script type=text/javascript>
+    // ajax加载后台数据post方法
+    $('.add-remark').click(function(){
+      var t = $(this).attr('pk');
+      $.ajax({
+        url: '/news/' + t,
+        type: 'POST',
+        success: function(r){
+          alert(r.news.author);
+          console.log(r.news);
+        },
+        error: function(r){
+          alert('Connection Error!');
+        },
+      })
+    });
+
+    $(function(){
+      function add(e){
+        var ndata = {
+          a: $('input[name="a"]').val(),
+          b: $('input[name="b"]').val(),
+        };
+        $.ajax({
+          url: '/add',
+          type: 'POST',
+          data: JSON.stringify(ndata),
+          contentType: 'application/json; charset=UTF-8',
+          success: function(r){
+            if (r.error) {
+              alert(r.error);
+            }
+            if (r.result) {
+              $('#result').text(r.result);
+              // alert(r.result);
+            }
+          },
+        });
+      };
+      $('#calculate').bind('click', add);
+    });
+
+    $(function(){
+      function add1(e){
+        var ndata = {
+          a: $('input[name="a1"]').val(),
+          b: $('input[name="b1"]').val(),
+          now: Date.now(),
+        };
+        $.getJSON('/add1', ndata, function(r){
+          if (r.result){
+          $('#result1').text(r.result);
+          }
+          if (r.error){
+            alert('You can input numbers');
+          }
+        })
+      };
+      $('#calculate1').bind('click', add1);
+    });
+    // 浏览器加载页面基础内容后执行
+    $(function(){
+      $.ajax({
+        url: '/api/news',
+        type: 'GET',
+        data: {path: window.location.pathname.split('/')[2], now: Date.now()},
+        dataType: 'json',
+        success: function(r){
+          $('.title').text(r.data.title);
+          $('.content').text(r.data.content);
+          $('.url').text(r.data.url);
+          $('.url').attr('href', r.data.url);
+          $('.add-remark').attr('pk', r.data.url.split('/')[4]);
+          $('.author').text(r.data.author)
+        }
+      })
+    })
+</script>
+</html>

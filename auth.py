@@ -8,8 +8,8 @@ from app import config_name
 # 路由配置
 if "dashboard" in config_name:
     login_manager.login_view = "dashboard.login"
-else:
-    login_manager.login_view = "admin.login"
+elif 'api' in config_name:
+    login_manager.login_view = "api.create_task"
 
 login_manager.login_message = "您没权限打开此页面" # 提示信息
 

@@ -3,6 +3,22 @@
 from app import db
 from datetime import datetime as dte
 
+
+class Jianshu(db.Document):
+    """
+    jianshu爬去的列表
+    """
+    url = db.StringField()
+    title = db.StringField()
+    author = db.StringField()
+    content = db.StringField()
+    meta = {
+        'indexes': [
+            'title',
+        ],
+        'collection': 'jianshu',
+    }
+
 class Student(db.Document):
     """
     测试post api

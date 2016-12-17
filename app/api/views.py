@@ -5,6 +5,7 @@ from app.models import News, AdminUser
 from app import access_log
 
 from flask import Flask, jsonify, abort, make_response, request
+from flask.ext.login import login_required
 
 from flask.ext.httpauth import HTTPBasicAuth
 auth = HTTPBasicAuth()
@@ -71,6 +72,9 @@ def get_tasks(task_id):
 # curl -i -H "Content-Type: application/json" -X POST -d '{"title":"Read a book"}' http://localhost:5000/api/tasks}'
 @api.route('/api/tasks', methods=['POST', 'GET'])
 @auth.login_required
+
+# flask_login实现
+# @login_required
 def create_task():
     if request.method == 'GET':
         return jsonify({'tasks': tasks})
