@@ -1,7 +1,9 @@
 # coding=utf-8
 
 # 启动flask应用 gunicorn -c hello:app
+# gunicorn -c gunicorn_server.py wsgi:app
 # gunicorn -w 2 -b 127.0.0.1:4000 hello:app
+
 import os
 
 from gevent import monkey
@@ -11,9 +13,9 @@ import multiprocessing
 
 debug = True
 loglevel = 'debug'
-bind = '0.0.0.0:8800'
-pidfile = 'log/gunicorn.pid'
-logfile = 'log/debug.log'
+bind = '0.0.0.0:8100'
+# pidfile = 'log/gunicorn.pid'
+# logfile = 'log/debug.log'
 
 #启动的进程数
 workers = multiprocessing.cpu_count() * 2 + 1

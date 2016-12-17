@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 *-*
-import os
 
+# gunicorn启动用到
 from app import setup_app
 app = setup_app()
