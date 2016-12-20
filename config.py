@@ -9,13 +9,6 @@ class Config:
     DEBUG = False
     PRESERVE_CONTEXT_ON_EXCEPTION = False
 
-    # mail config
-    MAIL_SERVER = 'smtp.163.com'
-    MAIL_PORT = 25
-    MAIL_USE_TLS = True
-    MAIL_USERNAME = '17095218904@163.com'
-    MAIL_PASSWORD = 'b123456'
-
     # scrapyd 地址
     SCRAPYD_URLS = [
         "http://localhost:6800/schedule.json",
@@ -74,23 +67,18 @@ class ApiLocalConfig(Config):
     pass
 
 class ApiDevConfig(Config):
-    DEBUG = True
     pass
 
 class ApiProdConfig(Config):
-    DEBUG = True
     pass
 
-class AdminLocalConfig(Config):
-    DEBUG = True
+class DashboardLocalConfig(ApiLocalConfig):
     pass
 
-class AdminDevConfig(Config):
-    DEBUG = True
+class DashboardDevConfig(ApiDevConfig):
     pass
 
-class AdminProdConfig(Config):
-    DEBUG = True
+class DashboardProdConfig(ApiProdConfig):
     pass
 
 config_mapping = {
@@ -98,7 +86,7 @@ config_mapping = {
     'api_dev': ApiDevConfig,
     'api_prod': ApiProdConfig,
 
-    'dashboard_local': AdminLocalConfig,
-    'dashboard_dev': AdminDevConfig,
-    'dashboard_prod': AdminProdConfig,
+    'dashboard_local': DashboardLocalConfig,
+    'dashboard_dev': DashboardDevConfig,
+    'dashboard_prod': DashboardProdConfig,
 }

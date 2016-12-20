@@ -1,38 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <title>new page</title>
     <link rel="stylesheet" href="{{url_for('static', filename='dashboard/css/bootstrap.min.css')}}" />
     <script type="text/javascript" src="{{url_for('static', filename='dashboard/js/jquery-2.2.3.min.js')}}"></script>
     <style type="text/css">
+
     </style>
-  </head>
-  <body>
+</head>
+
+<body>
     <div class="container">
-      <div class='row clearfix'>
-        <div class='col-md-12 column'>
-          <div class='row clearfix'>
-            <div class='col-md-2 column'>
-            </div>
-            <div class='col-md-8 column'>
-              <p>
-              <input type=text size=5 name=a> +
-                  <input type=text size=5 name=b> =
-                      <span id=result>?</span>
-              </p>
-              <p>
-              <input type="button" id="calculate" value="计算"></input>
-              </p>
-              <p>
-              <input type=text size=5 name=a1> +
-                  <input type=text size=5 name=b1> =
-                      <span id=result1>?</span>
-              </p>
-              <p>
-              <input type="button" id="calculate1" value="计算1"></input>
-              </p>
-              <h3 class='title'><h3>
+        <div class='row clearfix'>
+            <div class='col-md-12 column'>
+                <div class='row clearfix'>
+                    <div class='col-md-2 column'>
+                    </div>
+                    <div class='col-md-8 column'>
+                        <p>
+                            <input type=text size=5 name=a> +
+                            <input type=text size=5 name=b> =
+                            <span id=result>?</span>
+                        </p>
+                        <p>
+                            <input type="button" id="calculate" value="计算"></input>
+                        </p>
+                        <p>
+                            <input type=text size=5 name=a1> +
+                            <input type=text size=5 name=b1> =
+                            <span id=result1>?</span>
+                        </p>
+                        <p>
+                            <input type="button" id="calculate1" value="计算1"></input>
+                        </p>
+                        <h3 class='title'><h3>
               <p class='author'></p>
               <p> 来源: <a href='' class='url'></a></p>
             </div>
@@ -138,7 +141,7 @@
         dataType: 'json',
         success: function(r){
           $('.title').text(r.data.title);
-          $('.content').text(r.data.content);
+          $('.content').html(r.data.content);
           $('.url').text(r.data.url);
           $('.url').attr('href', r.data.url);
           $('.add-remark').attr('pk', r.data.url.split('/')[4]);

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>new page</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='dashboard/css/bootstrap.min.css')}}" />
+    <script type="text/javascript" src="{{url_for('static', filename='dashboard/js/jquery-2.2.3.min.js')}}"></script>
+    <link rel="stylesheet" href="{{url_for('static', filename='dashboard/css/scojs.css')}}" />
+        <script type="text/javascript" src="{{url_for('static', filename='dashboard/js/sco.message.js')}}"></script>
+    <link rel="stylesheet" href="{{url_for('static', filename='dashboard/css/sco.message.css')}}" />
+    <style type="text/css">
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row clearfix">
+            <div class="col-md-12 column">
+                <div class='col-md-2 column'>
+                </div>
+                <div class='col-md-8 column'>
+                    <ul class="nav nav-pills">
+                        <li class="active">
+                            <a href="{{ url_for('dashboard.get_news_list') }}">首页</a>
+                        </li>
+                        <li>
+                            <a href="#">简介</a>
+                        </li>
+                        <li class="disabled">
+                            <a href="#">信息</a>
+                        </li>
+                        <li class="pull-right">
+                            <a href="{{ url_for('dashboard.logout') }}">退出 </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class='col-md-2 column'>
+                </div>
+            </div>
+        </div>
+        <div class='row clearfix'>
+            <div class='col-md-12 column'>
+                <div class='row clearfix'>
+                    <div class='col-md-2 column'>
+                    </div>
+                    <div class='col-md-8 column'>
+                        <h3>简书热点</h3>
+                        <form class="query-form" class="form-horizontal" action="/news" method="GET">
+                            <!--一般hidden设置默认的参数-->
+                            <input type="hidden" name="page" id="id-page" value="1" />
+                            <div class="row">
+                                <div class="form-group col-md-2">
+                                    <label for="sourceSite" class="sr-only">Search</label>
+                                    <input type="text" class="form-control" id="" placeholder="Search" name="q" value="{{condition.q}}">
+                                </div>
+                                <div class="form-group col-md-2">
+                                    <label for="sourceSite" class="sr-only">source</label>
+                                    <select class="form-control" name="url">
+                                        <option value="">源站</option>
+                                        <option value="jianshu">简书</option>
+                                        <option value="douban">豆瓣</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-offset-1 col-md-1">
+                                    <button type="submit" class="btn btn-primary">查&nbsp;&nbsp;询</button>
+                                </div>
+                                <div class="col-md-offset-1 col-md-1">
+                                  <button type="submit" name='action' value='导出csv' class="btn btn-primary">导出csv</button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                    <div class='col-md-2 column'>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row clearfix">
+            <div class="col-md-12 column">
+                <div class="row">
+                    <div class="col-md-2 column">
+                    </div>
+                    <div class="col-md-8 column items">
+                        {% if page['items'] %} {% for new in page['items'] %}
+                        <h4><a href="{{url_for('dashboard.get_news_list')}}/{{new.url.split('/')[-1]}}">{{new.title}}</a> -- <a href="{{ url_for('dashboard.get_news_list') }}/{{new.url.split('/')[-1]}}/edit">edit</a> -- {{new.author}}</h4> {% else %} No news {% endfor %} {% endif %}
+                    </div>
+                    <div class="col-md-2 column">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 分页, 此部分可看为传递具体页面参数到后台-->
+        <nav style="text-align: center">
+            <ul class="pagination">
+                {% if page.previous %}
+                <li>
+                    <a href="javascript:search('{{page.previous}}')" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% endif %} {%if page.range and page.range[0] > 1%}
+                <li><a href="javascript:search('1')">1</a></li>
+                <li><a href="javascript:;">...</a></li>
+                {%endif%} {%for i in page.range %}
+                <li class="{%if page.cur_page==i %}active{%endif%}"><a href="javascript:search('{{i}}')">{{i}}</a></li>
+                {%endfor%} {%if page.range and page.range[-1]
+                < page.page_count %} <li><a href="javascript:;">...</a></li>
+                    <li><a href="javascript:search('{{page.page_count}}')">{{page.page_count}}</a></li>
+                    {%endif%} {% if page.next %}
+                    <li>
+                        <a href="javascript:search('{{page.next}}')" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+            </ul>
+        </nav>
+    </div>
+
+    <script type='text/javascript'>
+
+    // 接受flash函数数据
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+    {% if msgs %}
+        {%for category, msg in msgs%}
+        {% if category=="error" %}
+        $.scojs_message('{{msg}}', $.scojs_message.TYPE_ERROR);
+        {%else%}
+        $.scojs_message('{{msg}}', $.scojs_message.TYPE_OK);
+        {%endif%}
+        {%endfor%}
+    {% endif %}
+    {% endwith %}
+
+    // 加载列表页面
+    // $(function(){
+    //   var data = {
+    //     now: Date.now(),
+    //     page: $('id-page').val(),
+    //   };
+    //   $.ajax({
+    //     url: '/api/news',
+    //     type: 'GET',
+    //     data: data,
+    //     dataType: 'json',
+    //     success: function(r){
+    //       var items = r.ret.items;
+    //       var t = '';
+    //       for (var i=0; i<20;i++){
+    //         console.log(items[i]['title']);
+    //         t += '<h4><a href="/news/{0}">{1}</a>--{2}'.format([items[i]['url'].split('/')[4], items[i]['title'], items[i]['author']])
+    //       };
+    //       $('.items').html(t);
+    //     }
+    //   })
+    // })
+    // 这里相当于自动提交
+    function search(page) {
+        // 相当于点击某个链接页
+        // 这里可以接受一个或者多个参数
+        // 设置value
+        $("#id-page").val(page);
+        // 执行表单自动提交
+        // 由condition保留一些搜索历史
+        $(".query-form").submit();
+    };
+
+    String.prototype.replaceAll = function (exp, newStr) {
+    return this.replace(new RegExp(exp, "gm"), newStr);
+    };
+    /**
+     * 原型：字符串格式化
+     * @param args 格式化参数值
+     */
+    String.prototype.format = function(args) {
+        var result = this;
+        if (arguments.length < 1) {
+            return result;
+        }
+        var data = arguments; // 如果模板参数是数组
+        if (arguments.length == 1 && typeof (args) == "object") {
+            // 如果模板参数是对象
+            data = args;
+        }
+        for ( var key in data) {
+            var value = data[key];
+            if (undefined != value) {
+                result = result.replaceAll("\\{" + key + "\\}", value);
+            }
+        }
+        return result;
+    }
+    </script>
+</body>
+
+</html>
