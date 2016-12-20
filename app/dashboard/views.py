@@ -8,11 +8,16 @@ from app.dashboard import dashboard
 from app import access_log
 from app.utils import md5
 from flask.ext.login import login_required, current_user, login_user
+from app.decorators import superuser_required
 from mongoengine import Q
 import math
 import csv
 import time
 import StringIO
+import os
+import random
+import datetime
+from app import BASE_DIR
 
 @dashboard.route('/', methods=['GET'])
 def index():
@@ -44,6 +49,7 @@ def parse_page_data(qs):
     }
 
 @dashboard.route('/news/<string:url>/edit', methods=['GET', 'POST'])
+@superuser_required
 def news_edit(url):
     params = request.values.to_dict()
     queryset = dict(url__icontains=url)
@@ -58,6 +64,8 @@ def news_edit(url):
         action = params.get('edit', '')
         if action == '1':
             content = params.get('content', '')
+            if not content:
+                flash('sorry')
             qs.modify(content=content)
             qs.save()
             # flash
@@ -241,6 +249,50 @@ def add_test_get():
             return jsonify(result=a+b)
         except ValueError:
             return jsonify({'error': 'You can input numbers'})
+
+def gen_rnd_filename():
+    filename_prefix = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+    return '%s%s' % (filename_prefix, str(random.randrange(1000, 10000)))
+
+@dashboard.route('/ckupload/', methods=['POST', 'OPTIONS'])
+def ckupload():
+    """CKEditor file upload"""
+    error = ''
+    url = ''
+    callback = request.args.get("CKEditorFuncNum")
+
+    if request.method == 'POST' and 'upload' in request.files:
+        fileobj = request.files['upload']
+        fname, fext = os.path.splitext(fileobj.filename)
+        rnd_name = '%s%s' % (gen_rnd_filename(), fext)
+        filepath = os.path.join(dashboard.static_folder, rnd_name)
+        access_log.info(filepath)
+
+        # 检查路径是否存在，不存在则创建
+        dirname = os.path.dirname(filepath)
+        if not os.path.exists(dirname):
+            try:
+                os.makedirs(dirname)
+            except:
+                error = 'ERROR_CREATE_DIR'
+        elif not os.access(dirname, os.W_OK):
+            error = 'ERROR_DIR_NOT_WRITEABLE'
+
+        if not error:
+            fileobj.save(filepath)
+            url = url_for('dashboard.static', filename='%s' % (rnd_name))
+            access_log.info(url)
+    else:
+        error = 'post error'
+
+    res = """<script type="text/javascript">
+  window.parent.CKEDITOR.tools.callFunction(%s, '%s', '%s');
+</script>""" % (callback, url, error)
+
+    response = make_response(res)
+    response.headers["Content-Type"] = "text/html"
+    return response
+
 
 @dashboard.route('/logout')
 @login_required

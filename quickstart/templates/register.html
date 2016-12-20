@@ -1,0 +1,12 @@
+{% from "_formhelpers.html" import render_field %}
+<form method=post action="/register">
+  <dl>
+    <li>{{ render_field(form.username) }}</li>
+    {{ render_field(form.email) }}
+    {{ render_field(form.password) }}
+    {{ render_field(form.confirm) }}
+    {{ render_field(form.accept_tos) }}
+  </dl>
+  <p><input type=submit value=注册>
+  <button type=submit >submit</button>
+</form>

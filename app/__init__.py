@@ -8,12 +8,13 @@ from flask import Flask
 from flask.ext.login import LoginManager
 
 from config import config_mapping
-
+import redis
 import logging
 from logging.handlers import SysLogHandler
 from logging import Formatter, StreamHandler, FileHandler
 
 from flask.ext.mongoengine import MongoEngine
+from redis_session import RedisSessionInterface
 
 db = MongoEngine()
 
@@ -76,6 +77,10 @@ def setup_dashboard_app():
     from dashboard import dashboard as dashboard_blueprint
     app.register_blueprint(dashboard_blueprint)
     app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+
+    rset = app.config["REDIS_SETTIGNS"]["session"]
+    r = redis.Redis(host=rset["host"], port=rset["port"], db=rset["db"])
+    app.session_interface = RedisSessionInterface(redis=r)
 
     return app
 

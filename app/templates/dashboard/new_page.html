@@ -1,16 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <title>new page</title>
-    <link rel="stylesheet" href="{{url_for('static', filename='dashboard/css/bootstrap.min.css')}}" />
-    <script type="text/javascript" src="{{url_for('static', filename='dashboard/js/jquery-2.2.3.min.js')}}"></script>
-    <style type="text/css">
-
-    </style>
-</head>
-
+  {% extends 'dashboard/base.html' %}
+  {% block title %}content page{% endblock %}
+  {% block body %}
 <body>
     <div class="container">
         <div class='row clearfix'>
@@ -71,7 +63,8 @@
     </div>
     </div>
   </body>
-
+  {% endblock %}
+  {% block script %}
 <script type=text/javascript>
     // ajax加载后台数据post方法
     $('.add-remark').click(function(){
@@ -150,4 +143,5 @@
       })
     })
 </script>
+{% endblock %}
 </html>

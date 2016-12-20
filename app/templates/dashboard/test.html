@@ -1,0 +1,22 @@
+<script type="text/javascript" src="{{url_for('static', filename='dashboard/js/jquery-2.2.3.min.js')}}"></script>
+<form class='' id='login' action='/api/news' method='post'>
+  <input class='' type='hidden' name='username' value='1'>
+  <input class='' type='hidden' name='pass' value='1'>
+  <input class='' type='hidden' name='valid' value='1'>
+  <input class='' type='' name='page' value='1'>
+  <button class='' type='button'>submit</button>
+</form>
+<script type='text/javascript'>
+  $('button').click(function(){
+    var page = $('input[name="page"]');
+    $.getJSON(
+        '/api/news',
+        page,
+        function(r){
+          for (var i=0;i<20;i++) {
+            console.log(r.ret.items[i]['title']);
+          }
+        }
+        );
+  });
+</script>
