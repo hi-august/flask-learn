@@ -133,6 +133,8 @@ def get_news_list():
         news = []
     if news:
         flash(params, 'info')
+        realip = request.environ['REMOTE_ADDR']
+        access_log.info('Your ip is %s' %realip)
         return render_template(
             'dashboard/new_list1.html',
             # 定制分页

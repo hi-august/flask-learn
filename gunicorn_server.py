@@ -1,7 +1,7 @@
 # coding=utf-8
 
 # 启动flask应用 gunicorn -c hello:app
-# gunicorn -c gunicorn_server.py wsgi:app
+# FLASK_SERVER=dashboard gunicorn -c gunicorn_server.py wsgi:ap
 # gunicorn -w 2 -b 127.0.0.1:4000 hello:app
 
 import os
@@ -13,7 +13,7 @@ import multiprocessing
 
 debug = True
 loglevel = 'debug'
-bind = '0.0.0.0:8100'
+bind = '0.0.0.0:9100'
 # pidfile = 'log/gunicorn.pid'
 # logfile = 'log/debug.log'
 
