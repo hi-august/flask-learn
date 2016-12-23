@@ -7,19 +7,49 @@
     {% block head %}
     <link rel="stylesheet" href="{{url_for('static', filename='dashboard/css/bootstrap.min.css')}}" />
     <link rel="stylesheet" href="{{url_for('static', filename='dashboard/css/login.css')}}" />
-    <script type="text/javascript" src="{{url_for('static', filename='dashboard/js/jquery-2.2.3.min.js')}}"></script>
-    <script type="text/javascript" src="{{url_for('static', filename='dashboard/js/jquery.md5.js')}}"></script>
     <link rel="stylesheet" href="{{url_for('static', filename='dashboard/css/scojs.css')}}" />
     <link rel="stylesheet" href="{{url_for('static', filename='dashboard/css/sco.message.css')}}" />
+    <link rel="stylesheet" href="{{url_for('static', filename='dashboard/css/bootstrapSwitch.css')}}" />
+    <script type="text/javascript" src="{{url_for('static', filename='dashboard/js/jquery-2.2.3.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='dashboard/js/jquery.md5.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static', filename='dashboard/js/sco.message.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='dashboard/js/sco.confirm.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='dashboard/js/bootstrapSwitch.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='dashboard/js/bootstrap.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='dashboard/js/sco.modal.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='dashboard/js/layer.js')}}"></script>
     {% endblock %} {%block style%} {% endblock %}
 </head>
 {% block body %}
-
 <body>
+{% block nav %}
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <ul class="nav nav-pills">
+                <li class="active">
+                    <a href="{{ url_for('dashboard.get_news_list') }}">首页</a>
+                </li>
+                <li>
+                    <a href="#">简介</a>
+                </li>
+                <li class="disabled">
+                    <a href="#">信息</a>
+                </li>
+                <li class="pull-right">
+                    <a class='logout' data-trigger='confirm' href="{{ url_for('dashboard.logout') }}">退出 </a>
+                </li>
+                </ul>
+        </div>
+    </div>
+  {% endblock %}
 </body>
 {% endblock %} {% block script %}
 <script type="text/javascript">
+    $('.logout').click(function() {
+        $(this).scojs_confirm({
+            content: 'Do you want logout',
+        });
+    });
     {% with msgs = get_flashed_messages(with_categories=true) %}
     {% if msgs %}
         {%for category, msg in msgs%}

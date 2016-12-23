@@ -1,147 +1,200 @@
-<!DOCTYPE html>
-<html lang="en">
-  {% extends 'dashboard/base.html' %}
-  {% block title %}content page{% endblock %}
-  {% block body %}
+ {% extends 'dashboard/base.html' %} {% block title %}content page{% endblock %} {% block body %}
+
 <body>
     <div class="container">
+        <br> {% block nav %} {{ super() }} {% endblock %}
         <div class='row clearfix'>
             <div class='col-md-12 column'>
-                <div class='row clearfix'>
-                    <div class='col-md-2 column'>
+                <h3 class='text-center title'></h3>
+                <p class='text-center author'></p>
+                <p class='text-center'> 来源:
+                    <a href='' class='url'></a>
+                </p>
+            </div>
+        </div>
+        <div class='row clearfix'>
+            <div class='col-md-12 column'>
+                <p class='text-center content'></p>
+            </div>
+        </div>
+        <div class='row clearfix'>
+            <div class='col-md-12 column'>
+                <p>
+                    <a href="javascript:;" class="get_author" pk="">ajax_get_author</a>
+                    <br/>
+                    <a data-trigger="modal" href="" data-title="title" class="btn" style="padding:0px;">title</a>
+                    <br/>
+                    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+                                    </button>
+                                    <h4 class="modal-title" id="myModalLabel">请添加评论</h4>
+                                </div>
+                                <div class="modal-body" contenteditable='true'>
+                                    <form class='commit-form' action='/news' method='POST'>
+                                        <label> 评论: </label>
+                                        <textarea class='form-control' name='commit'></textarea>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                                        关闭
+                                    </button>
+                                    <button type="button" class="modal_commit btn btn-primary">
+                                        保存
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- /.modal-content -->
+                        </div>
+                        <!-- /.modal-dialog -->
                     </div>
-                    <div class='col-md-8 column'>
-                        <p>
-                            <input type=text size=5 name=a> +
-                            <input type=text size=5 name=b> =
-                            <span id=result>?</span>
-                        </p>
-                        <p>
-                            <input type="button" id="calculate" value="计算"></input>
-                        </p>
-                        <p>
-                            <input type=text size=5 name=a1> +
-                            <input type=text size=5 name=b1> =
-                            <span id=result1>?</span>
-                        </p>
-                        <p>
-                            <input type="button" id="calculate1" value="计算1"></input>
-                        </p>
-                        <h3 class='title'><h3>
-              <p class='author'></p>
-              <p> 来源: <a href='' class='url'></a></p>
+                    <!-- /.modal -->
+                    <button class="btn btn-primary btn-mg" data-toggle="modal" data-target="#myModal">
+                       评论
+                    </button>
+                    <a href="javascript:;" class="add-commit" pk="">评论</a>
+                    <br/>
+                </p>
             </div>
-            <div class='col-md-2 column'>
-            </div>
-          </div>
         </div>
-      </div>
-      <div class='row clearfix'>
-        <div class='col-md-12 column'>
-          <div class='row clearfix'>
-            <div class='col-md-2 column'>
-            </div>
-            <div class='col-md-8 column'>
-              <p class='content'></p>
-              </p>
-            </div>
-            <div class='col-md-2 column'>
-            </div>
-          </div>
-        </div>
-      </div>
-    <div class='row clearfix'>
-      <div class='col-md-2 column'>
-        </div>
-      <div class='col-md-8 column'>
-        <p>
-          <a href="javascript:;" class="add-remark" pk="">备注</a><br/>
-        </p>
-        </div>
-      <div class='col-md-2 column'>
-        </div>
-    </div>
-    </div>
-  </body>
-  {% endblock %}
-  {% block script %}
-<script type=text/javascript>
-    // ajax加载后台数据post方法
-    $('.add-remark').click(function(){
-      var t = $(this).attr('pk');
-      $.ajax({
-        url: '/news/' + t,
-        type: 'POST',
-        success: function(r){
-          alert(r.news.author);
-          console.log(r.news);
+</body>
+{% endblock %} {% block script %} {{ super() }}
+<script type='text/javascript'>
+$('.modal_commit').click(function() {
+    var commit = $("textarea[name='commit']").val();
+    $.ajax({
+        cache: false,
+        type: "POST",
+        url: '/test',
+        data: {
+            commit: commit,
+            pk: window.location.pathname.split('/')[2]
         },
-        error: function(r){
-          alert('Connection Error!');
+        async: false,
+        error: function(request) {
+            layer.msg("网络错误!");
         },
-      })
+        success: function(data) {
+            if (data.ok){
+                layer.msg(data.ok);
+                $('#myModal').modal('hide');
+            }
+            if (data.error){
+                layer.msg(data.error);
+                $.scojs_message(data.error, $.scojs_message.TYPE_ERROR);
+            }
+            // 提示信息
+            // $.scojs_message(data.ok, $.scojs_message.TYPE_OK);
+            // $('#myModal').modal('show');
+        }
     });
+});
+$(".add-commit").click(function() {
+    layer.prompt({
+        title: '请输入你的评论',
+        formType: 2
+    }, function(text) {
+        $.ajax({
+            cache: false,
+            type: "POST",
+            url: '/test',
+            data: {
+                commit: text,
+                pk: window.location.pathname.split('/')[2]
+            },
+            async: false,
+            error: function(request) {
+                layer.msg("网络错误!");
+            },
+            success: function(data) {
+                layer.msg(data.ok);
+            }
+        });
+    });
+});
+// ajax加载后台数据post方法
+// $('.get_author').click(function(){
+//   var t = $(this).attr('pk');
+//   $.ajax({
+//     url: '/news/' + t,
+//     type: 'POST',
+//     success: function(r){
+//       console.log(r.news);
+//     },
+//     error: function(r){
+//       alert('Connection Error!');
+//     },
+//   })
+// });
 
-    $(function(){
-      function add(e){
+$(function() {
+    function add(e) {
         var ndata = {
-          a: $('input[name="a"]').val(),
-          b: $('input[name="b"]').val(),
+            a: $('input[name="a"]').val(),
+            b: $('input[name="b"]').val(),
         };
         $.ajax({
-          url: '/add',
-          type: 'POST',
-          data: JSON.stringify(ndata),
-          contentType: 'application/json; charset=UTF-8',
-          success: function(r){
-            if (r.error) {
-              alert(r.error);
-            }
-            if (r.result) {
-              $('#result').text(r.result);
-              // alert(r.result);
-            }
-          },
+            url: '/add',
+            type: 'POST',
+            data: JSON.stringify(ndata),
+            contentType: 'application/json; charset=UTF-8',
+            success: function(r) {
+                if (r.error) {
+                    alert(r.error);
+                }
+                if (r.result) {
+                    $('#result').text(r.result);
+                    // alert(r.result);
+                }
+            },
         });
-      };
-      $('#calculate').bind('click', add);
-    });
+    };
+    $('#calculate').bind('click', add);
+});
 
-    $(function(){
-      function add1(e){
+$(function() {
+    function add1(e) {
         var ndata = {
-          a: $('input[name="a1"]').val(),
-          b: $('input[name="b1"]').val(),
-          now: Date.now(),
+            a: $('input[name="a1"]').val(),
+            b: $('input[name="b1"]').val(),
+            now: Date.now(),
         };
-        $.getJSON('/add1', ndata, function(r){
-          if (r.result){
-          $('#result1').text(r.result);
-          }
-          if (r.error){
-            alert('You can input numbers');
-          }
+        $.getJSON('/add1', ndata, function(r) {
+            if (r.result) {
+                $('#result1').text(r.result);
+            }
+            if (r.error) {
+                alert('You can input numbers');
+            }
         })
-      };
-      $('#calculate1').bind('click', add1);
-    });
-    // 浏览器加载页面基础内容后执行
-    $(function(){
-      $.ajax({
+    };
+    $('#calculate1').bind('click', add1);
+});
+// 浏览器加载页面基础内容后执行
+$(function() {
+    $.ajax({
         url: '/api/news',
         type: 'GET',
-        data: {path: window.location.pathname.split('/')[2], now: Date.now()},
+        data: {
+            path: window.location.pathname.split('/')[2],
+            now: Date.now()
+        },
         dataType: 'json',
-        success: function(r){
-          $('.title').text(r.data.title);
-          $('.content').html(r.data.content);
-          $('.url').text(r.data.url);
-          $('.url').attr('href', r.data.url);
-          $('.add-remark').attr('pk', r.data.url.split('/')[4]);
-          $('.author').text(r.data.author)
+        success: function(r) {
+            $('.title').text(r.data.title);
+            $('.content').html(r.data.content);
+            $('.url').text(r.data.url);
+            $('.url').attr('href', r.data.url);
+            $('.get_author').attr('pk', r.data.url.split('/')[4]);
+            $('.author').text(r.data.author);
+            $('img').addClass('img-responsive');
         }
-      })
     })
+});
 </script>
 {% endblock %}
+
 </html>

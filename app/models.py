@@ -12,6 +12,7 @@ class Jianshu(db.Document):
     title = db.StringField()
     author = db.StringField()
     content = db.StringField()
+    commit = db.ListField()
     meta = {
         'indexes': [
             'title',

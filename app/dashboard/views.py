@@ -48,6 +48,18 @@ def parse_page_data(qs):
         "range": cur_range,             # 分页按钮显示的范围
     }
 
+@dashboard.route('/news/<string:url>/delete', methods=['GET'])
+def news_delete(url):
+    queryset = dict(url__icontains=url)
+    ref = request.referrer
+    if request.method == 'GET':
+        try:
+            Jianshu.objects(**queryset).first().delete()
+            flash(u'已经成功删除')
+            return redirect(ref)
+        except:
+            pass
+
 @dashboard.route('/news/<string:url>/edit', methods=['GET', 'POST'])
 @superuser_required
 def news_edit(url):
@@ -58,7 +70,6 @@ def news_edit(url):
         return render_template(
             'dashboard/new_page_edit.html',
             qs=qs,
-
         )
     elif request.method == 'POST':
         action = params.get('edit', '')
@@ -132,9 +143,8 @@ def get_news_list():
     except:
         news = []
     if news:
-        flash(params, 'info')
         realip = request.environ['REMOTE_ADDR']
-        access_log.info('Your ip is %s' %realip)
+        # access_log.info('Your ip is %s' %realip)
         return render_template(
             'dashboard/new_list1.html',
             # 定制分页
@@ -166,6 +176,7 @@ def get_news_page(url):
     # return jsonify({'code': 1})
     if request.method == 'GET':
         # 用ajax加载
+        flash(news.title)
         return render_template('dashboard/new_page.html')
         # 直接显示在模板中
         # return render_template('dashboard/new_page.html', news=news)
@@ -306,9 +317,20 @@ def logout():
 @dashboard.route('/test', methods=['GET', 'POST'])
 def test_dashboard():
     params = request.values.to_dict()
+    commit = params.get('commit', '')
+    pk = params.get('pk', '')
     page = params.get('page', '')
+    access_log.info('%s %s' %(pk, commit))
     if page:
         pass
+    if not commit:
+        return jsonify({'error': u'请添加具体评论'})
+    if commit and pk:
+        queryset = dict(url__icontains=pk)
+        ret = Jianshu.objects(**queryset).first()
+        ret.commit.append({commit: time.time()})
+        ret.save()
+    return jsonify({'ok': commit})
     return render_template('dashboard/base.html')
     # access_log.info('dashboard test ok')
     # return jsonify({'code': 'ok'})
