@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %} - August's Blog</title>
+    {% block head %}
+    <script type="text/javascript" src="{{url_for('static', filename='dashboard/js/jquery-2.2.3.min.js')}}"></script>
+    {% endblock %} {%block style%} {% endblock %}
+</head>
+{% block body %}
+<body>
+</body>
+{% endblock %} {% block script %}
+<script type="text/javascript">
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+    {% if msgs %}
+        {%for category, msg in msgs%}
+        {% if category=="error" %}
+        $.scojs_message('{{msg}}', $.scojs_message.TYPE_ERROR);
+        {%else%}
+        $.scojs_message('{{msg}}', $.scojs_message.TYPE_OK);
+        {%endif%}
+        {%endfor%}
+    {% endif %}
+    {% endwith %}
+</script>
+{% endblock %}
+</html>

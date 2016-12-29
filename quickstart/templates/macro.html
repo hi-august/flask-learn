@@ -1,0 +1,16 @@
+{% macro input(name, value='', type='text', size=20, class='') -%}
+  <input class='{{ class }}' type='{{ type }}' name='{{ name }}' value='{{ value|e }}' size='{{ size }}'>
+{%- endmacro %}
+
+{% macro button(name, class='', value='', type='submit') -%}
+  <button class='{{ class }}' name='{{ name }}' value='{{ value|e }}' type='{{ type }}'>submit</button>
+{%- endmacro %}
+
+{% macro form(action, method='get') -%}
+<form action='{{ action }}' method='{{ method }}'>
+  {{input('username', value='2')}}
+  {{button('name')}}
+  {{ varargs }}
+  {{ kwargs }}
+</form>
+{%- endmacro %}

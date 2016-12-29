@@ -9,6 +9,16 @@ class Config:
     DEBUG = False
     PRESERVE_CONTEXT_ON_EXCEPTION = False
 
+    # mail config
+    MAIL_SERVER = 'smtp.163.com'
+    MAIL_PORT = 25
+    MAIL_USE_TLS = True
+    MAIL_USERNAME = 'zyf6112@163.com'
+    MAIL_PASSWORD = 'a123456'
+
+    # flask-sqlalchemy配置
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:Cxk!51789@localhost/web'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     # scrapyd 地址
     SCRAPYD_URLS = [
         "http://localhost:6800/schedule.json",
@@ -89,4 +99,8 @@ config_mapping = {
     'dashboard_local': DashboardLocalConfig,
     'dashboard_dev': DashboardDevConfig,
     'dashboard_prod': DashboardProdConfig,
+
+    'blog_local': DashboardLocalConfig,
+    'blog_dev': DashboardDevConfig,
+    'blog_prod': DashboardProdConfig,
 }

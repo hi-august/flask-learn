@@ -6,6 +6,10 @@ from functools import wraps
 from flask import current_app, flash
 from flask.ext.login import current_user
 
+# 异步调用
+# @async
+# def print():
+    # print 233
 
 def async(func):
     def _wrap(*args, **kwargs):

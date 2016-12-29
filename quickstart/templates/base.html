@@ -1,9 +1,12 @@
+{% import 'macro.html' as macro %}
 {% if title %}
 <title> {{title}} </title>
 {% else %}
 <title> not title </title>
 {% endif %}
+{{ macro.form('/api/news/', method='post') }}
 
+{#request.headers#}
 {% for n in username %}
 <h3> {{n.username}} </h3>
 {% endfor %}

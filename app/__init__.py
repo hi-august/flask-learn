@@ -4,6 +4,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+# celery任务队列, 邮件, sentry错误
 from flask import Flask
 from flask.ext.login import LoginManager
 
@@ -14,13 +15,17 @@ from logging.handlers import SysLogHandler
 from logging import Formatter, StreamHandler, FileHandler
 
 from flask.ext.mongoengine import MongoEngine
+from flask_sqlalchemy import SQLAlchemy
 from redis_session import RedisSessionInterface
+from flask.ext.mail import Mail
+mail = Mail()
 
 db = MongoEngine()
+mysql_db = SQLAlchemy()
 
 login_manager = LoginManager()
 
-config_name = "%s_%s" % (os.getenv('FLASK_SERVER') or 'api', os.getenv('FLASK_CONFIG') or 'local')
+config_name = "%s_%s" % (os.getenv('flask_server') or 'dashboard', os.getenv('flask_config') or 'local')
 config = config_mapping[config_name]
 
 BASE_DIR = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
@@ -58,12 +63,26 @@ def setup_app():
     servers = {
         'api': setup_api_app,
         'dashboard': setup_dashboard_app,
+        'blog': setup_blog_app,
     }
     server_type = config_name.split("_")[0]
     app = servers[server_type]()
+    mysql_db.init_app(app)
+    mail.init_app(app)
     init_logging(app, server_type)
     return app
 
+def setup_blog_app():
+    app = Flask(__name__)
+    app.config.from_object(config)
+    config.init_app(app)
+    print('run in blog server, use %s' %config.__name__)
+
+    from blog import blog as blog_blueprint
+    app.register_blueprint(blog_blueprint)
+    app.secret_key = 'A0Zr98j/3yX R~XHH]LWX/,?RT'
+
+    return app
 
 
 def setup_dashboard_app():

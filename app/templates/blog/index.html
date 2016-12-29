@@ -1,0 +1,16 @@
+{% extends 'blog/base.html' %}
+<body>
+</body>
+{% block script %}
+{{ super() }}
+<script type=text/javascript>
+$.getJSON('/blog/api', function(r){
+  var out = '';
+  var items = r.result.items
+  for (i=0;i<items.length;i++){
+    out += items[i].title + '--' + items[i].content + '<br>'
+  }
+  $('body').html(out);
+});
+</script>
+{% endblock %}

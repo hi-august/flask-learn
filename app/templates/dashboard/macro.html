@@ -1,0 +1,20 @@
+{# 类似于函数, 向宏模板传递参数 #}
+
+{% macro input(name, value='', type='text', size=20, class='') -%}
+  <input class='{{ class }}' type='{{ type }}' name='{{ name }}' value='{{ value|e }}' size='{{ size }}'>
+{%- endmacro %}
+
+{% macro textarea(name, class='', value='', rows=20, cols=40) -%}
+  <input class='{{ class }}' name='{{ name }}' value='{{ value|e }}' rows='{{ rows }}'>
+{%- endmacro %}
+
+{% macro button(name, class='', type='submit') -%}
+  <button class='{{ class }}' name='{{ name }}' type='{{ type }}'>submit</button>
+{%- endmacro %}
+
+{% macro form(action, method='get') -%}
+<form action='{{ action }}' method='{{ method }}'>
+  {{input('username', value='2')}}
+  {{button('name')}}
+</form>
+{%- endmacro %}

@@ -11,13 +11,12 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 app = setup_app()
 manager = Manager(app)
 
-
+# flask 中分为应用上下文和请求上下文
+# 请求上下文request, session
+# 应用上下文g, current_app
 def make_shell_context():
     import app.models as m
-    # import app.flow as f
-    get_order = lambda o: m.Order.objects.get(order_no=o)
-    # get_line = lambda o: m.Line.objects.get(line_id=o)
-    return dict(app=app, db=db, m=m, get_order=get_order)
+    return dict(app=app, db=db, m=m)
 
 manager.add_command("shell", Shell(make_context=make_shell_context))
 

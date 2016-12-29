@@ -19,6 +19,12 @@
     <div class="container">
         <br> {% block nav %} {{ super() }} {% endblock %}
         <br>
+              <br>
+              <ol class="breadcrumb">
+                  <li><a href="#">Home</a></li>
+                  <li><a href="#">Library</a></li>
+                  <li class="active">Data</li>
+              </ol>
         <div class='row clearfix'>
             <div class='col-md-12 column'>
                 <form action='' method='POST'>
@@ -43,7 +49,8 @@
                     <textarea name="" id="content" class="ckeditor" rows="" cols="">
                         {{qs.content}}
                     </textarea>
-                    <button type='button'>保存</button>
+                    <br>
+                    <button class='btn btn-primary pull-right' type='button'>保存</button>
                 </form>
             </div>
         </div>

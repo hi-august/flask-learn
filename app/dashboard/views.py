@@ -18,6 +18,7 @@ import os
 import random
 import datetime
 from app import BASE_DIR
+from flask import current_app, g
 
 @dashboard.route('/', methods=['GET'])
 def index():
@@ -82,18 +83,24 @@ def news_edit(url):
             # flash
             return redirect(url_for('dashboard.get_news_page', url=url))
 
-@dashboard.route('/news', methods=['GET'])
+@dashboard.route('/news/', methods=['GET'])
 @login_required
 def get_news_list():
     params = request.values.to_dict()
     q = params.get("q", "")
     queryset = {}
+    access_log.info(current_user.username)
+    # access_log.info(session.viewitems())
+    # access_log.info(request.environ)
+    # access_log.info(dir(g))
+    # access_log.info(current_app.config)
+    # access_log.info(request.cookies)
     if q:
         queryset.update(title__icontains=q)
 
     action = params.get("action", "查询")
 
-    # 导出csv
+    # 导出csv, 这里可以为响应流(yield)生成
     if action == "导出csv":
         qs = Jianshu.objects.filter(**queryset)
         t1 = time.time()
@@ -143,7 +150,7 @@ def get_news_list():
     except:
         news = []
     if news:
-        realip = request.environ['REMOTE_ADDR']
+        # realip = request.environ['REMOTE_ADDR']
         # access_log.info('Your ip is %s' %realip)
         return render_template(
             'dashboard/new_list1.html',
@@ -156,7 +163,7 @@ def get_news_list():
         return jsonify({'error': 1})
     # return jsonify({'login': 'success'})
 
-@dashboard.route('/api/news', methods=['GET'])
+@dashboard.route('/api/news/', methods=['GET'])
 @login_required
 def get_api_news_page():
     url = request.args.get('path', '')
@@ -222,9 +229,9 @@ class LoginInView(MethodView):
             flash("用户名或密码错误!!!", "error")
             return redirect(url_for('dashboard.login'))
 
-dashboard.add_url_rule("/login", view_func=LoginInView.as_view('login'))
+dashboard.add_url_rule("/login/", view_func=LoginInView.as_view('login'))
 
-@dashboard.route('/ajax_login', methods=['GET'])
+@dashboard.route('/ajax_login/', methods=['GET'])
 def ajax_login():
     # ajax登陆验证
     username = request.args.get('username')
@@ -239,7 +246,7 @@ def ajax_login():
     except AdminUser.DoesNotExist:
         return jsonify({'error': 1 })
 
-@dashboard.route('/add', methods=['POST'])
+@dashboard.route('/add/', methods=['POST'])
 def add_test():
     # 获取json数据,post ajax
     info = request.json
@@ -251,7 +258,7 @@ def add_test():
         except ValueError:
             return jsonify({'error': 'You can input numbers'})
 
-@dashboard.route('/add1', methods=['GET'])
+@dashboard.route('/add1/', methods=['GET'])
 def add_test_get():
     if request.method == 'GET':
         try:
@@ -307,16 +314,17 @@ def ckupload():
     return response
 
 
-@dashboard.route('/logout')
+@dashboard.route('/logout/')
 @login_required
 def logout():
     flask_login.logout_user()
     return redirect(url_for('dashboard.login'))
     # return jsonify({'logout': 'success'})
 
-@dashboard.route('/test', methods=['GET', 'POST'])
+@dashboard.route('/test/', methods=['GET', 'POST'])
 def test_dashboard():
     params = request.values.to_dict()
+    params['str_date'] = time.strftime('%Y-%m-%d')
     commit = params.get('commit', '')
     pk = params.get('pk', '')
     page = params.get('page', '')
@@ -328,7 +336,7 @@ def test_dashboard():
     if commit and pk:
         queryset = dict(url__icontains=pk)
         ret = Jianshu.objects(**queryset).first()
-        ret.commit.append({commit: time.time()})
+        ret.commit.append({'commit': commit, 'create_time': datetime.datetime.now()})
         ret.save()
     return jsonify({'ok': commit})
     return render_template('dashboard/base.html')

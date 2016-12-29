@@ -1,16 +1,24 @@
 {% extends 'dashboard/base.html' %} {% block title %}news list page{% endblock %} {% block body %}
+{% import 'dashboard/macro.html' as macro %}
 
 <body>
     <div class="container">
         <br> {% block nav %} {{ super() }} {% endblock %}
         <div class='row clearfix'>
             <div class='col-md-12 column'>
+            <caption>
+                <div class="switch switch-small pull-right" >
+                        <input type="checkbox" />
+                </div>
+                    {{format_datetime}}
                 <h3><label>简书热点</label></h3>
+            </caption>
                 <form class="query-form" class="form-horizontal" action="/news" method="GET">
                     <!--一般hidden设置默认的参数-->
-                    <input type="hidden" name="page" id="id-page" value="1" />
+                    {{ macro.input('page', type='hidden', value='1')}}
+                    {{ macro.input('search-status', type='hidden', value='')}}
                     <div class="row">
-                        <div class="form-group col-md-3">
+                        <div class="form-group col-md-4">
                             <label for="sourceSite" class="sr-only">Search</label>
                             <input type="text" class="form-control" id="" placeholder="Search" name="q" value="{{condition.q}}">
                         </div>
@@ -22,10 +30,24 @@
                                 <option value="douban">豆瓣</option>
                             </select>
                         </div>
-                        <div class="col-md-offset-1 col-md-1">
+                        <div class="form-group  col-md-2">
+                        <label for="sourceSite" class="sr-only">起始日期</label>
+                        <div class="input-group date form_datetime" data-date="" data-date-format="" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
+                            <input class="form-control" size="16" type="text" value="{{condition.str_date}}" readonly name="str_date">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        </div>
+                    </div>
+                    <div class="form-group  col-md-2">
+                        <label for="sourceSite" class="sr-only">起始日期</label>
+                        <div class="input-group date form_datetime" data-date="" data-date-format="" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
+                            <input class="form-control" size="16" type="text" value="{{condition.str_date}}" readonly name="str_date">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        </div>
+                    </div>
+                        <div class="col-md-1 pull-right">
                             <button type="submit" class="btn btn-primary">查&nbsp;&nbsp;询</button>
                         </div>
-                        <div class="col-md-offset-1 col-md-1">
+                        <div class="col-md-1 pull-right">
                             <button type="submit" name='action' value='导出csv' class="btn btn-primary">导出csv</button>
                         </div>
                     </div>
@@ -34,12 +56,40 @@
         </div>
         <div class="row clearfix">
             <div class="col-md-12 column">
-                {% if page['items'] %} {% for new in page['items'] %}
-                <h4 id='news'><a href="{{url_for('dashboard.get_news_list')}}/{{new.url.split('/')[-1]}}">{{new.title}}</a>
-                            -- {{ new.author }}
-                            -- <a class='edit' data-trigger="confirm" href="{{ url_for('dashboard.get_news_list') }}/{{new.url.split('/')[-1]}}/edit">edit</a>
-                            -- <a class='delete' data-trigger="confirm" href="{{ url_for('dashboard.get_news_list') }}/{{new.url.split('/')[-1]}}/delete">delete</a>
-                        </h4> {% else %} No news {% endfor %} {% endif %}
+        <table class="table table-hover table-bordered" style="margin-bottom: 0px;">
+            <caption>
+                <div class="pull-right">
+                    <span>记录数：<label class="text-danger">{{page["total"]}}条</label></span>
+                </div>
+            </caption>
+            <thead>
+                <tr>
+                    <th>标题</th>
+                    <th>作者</th>
+                    <th>编辑</th>
+                    <th>删除</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {%for new in page["items"]%}
+                <tr>
+                    <td>
+                        <h5><a href="{{url_for('dashboard.get_news_list')}}{{new.url.split('/')[-1]}}">{{new.title}}</a></h5>
+                    </td>
+                    <td>
+                        {{new.author}}
+                    </td>
+                    <td>
+                        <a class='edit' data-trigger="" href="{{ url_for('dashboard.get_news_list') }}{{new.url.split('/')[-1]}}/edit">edit</a>
+                    </td>
+                    <td>
+                        <a class='delete' data-trigger="confirm" href="{{ url_for('dashboard.get_news_list') }}{{new.url.split('/')[-1]}}/delete">delete</a>
+                    </td>
+                </tr>
+                {%endfor%}
+            </tbody>
+        </table>
             </div>
         </div>
         <div class="row clearfix">
@@ -74,14 +124,27 @@
 </body>
 {% endblock %} {% block script %} {{ super() }}
 <script type='text/javascript'>
-$('.edit').click(function() {
-    var title = this.parentElement.children[0].text
-    $('.edit').scojs_confirm({
-        content: 'Do you want to edit ' + title,
+    $(".form_datetime").datetimepicker({
+        format: "yyyy-mm-dd",
+        autoclose: true,
+        todayBtn: true,
+        pickerPosition: "bottom-left",
+        language: "zh-CN",
+        minView: 2,
     });
+$('.switch').on('switch-change', function(e, data){
+    var sts = data.value;
+    if (sts){
+      $('form').css('display', 'none');
+      $('input[name="search-status"]').attr('name', sts)
+    }
+    else {
+      $('form').css('display', 'block');
+      $('input[name="search-status"]').attr('name', sts)
+    }
 });
 $('.delete').click(function() {
-    var title = this.parentElement.children[0].text
+    var title = this.parentElement.parentElement.children[0].textContent;
     $(this).scojs_confirm({
         content: 'Do you want to delete ' + title,
     });
@@ -113,7 +176,7 @@ function search(page) {
     // 相当于点击某个链接页
     // 这里可以接受一个或者多个参数
     // 设置value
-    $("#id-page").val(page);
+    $("input[name='page']").val(page);
     // 执行表单自动提交
     // 由condition保留一些搜索历史
     $(".query-form").submit();

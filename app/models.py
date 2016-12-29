@@ -3,19 +3,60 @@
 from app import db
 from datetime import datetime as dte
 
+class Category(db.Document):
+    name = db.StringField(required=True)
+
+    def __unicode__(self):
+        return self.name
+
+class Post(db.Document):
+    # ReferenceField保存
+    # Post(title='hi', content='hello word', category=Category(name='python')).save()
+    title = db.StringField(required=True)
+    content = db.StringField(required=True, unique_with='title')
+    create_time = db.DateTimeField(default=dte.now())
+    update_time = db.DateTimeField(default=dte.now())
+    tag = db.StringField()
+    category = db.ReferenceField(Category, required=True)
+    # commit = db.ListField()
+    commit = db.ListField(field=db.ListField(field=db.StringField()))
+    is_show = db.IntField(default=0)
+    is_closed = db.BooleanField(default=False)
+    extra_info = db.DictField()
+
+    meta = {
+        'indexes': [
+            'title',
+            'create_time',
+            'update_time',
+            'tag',
+        ],
+        'collection': 'blog',
+    }
 
 class Jianshu(db.Document):
     """
     jianshu爬去的列表
+    primary_key
     """
-    url = db.StringField()
-    title = db.StringField()
+    url = db.StringField(required=True)
+    title = db.StringField(required=True, unique_with='url')
+    link_id = db.StringField()
     author = db.StringField()
     content = db.StringField()
-    commit = db.ListField()
+    category = db.ReferenceField(Category)
+    catalogue = db.StringField()
+    source = db.StringField()
+    update_datetime = db.DateTimeField()
+    # commit = db.ListField()
+    commit = db.ListField(field=db.ListField(field=db.StringField()))
+    is_show = db.IntField(default=0)
     meta = {
         'indexes': [
             'title',
+            'author',
+            'url',
+            'update_datetime',
         ],
         'collection': 'jianshu',
     }
@@ -52,7 +93,7 @@ class AdminUser(db.Document):
     create_datetime = db.DateTimeField(default=dte.now)
     is_switch = db.IntField()
     yh_type = db.StringField(default="BOCB2C")
-    source_include = db.ListField(default=["yhzf", "zfb"])        # 该用户处理的源站
+    source_include = db.ListField(field=db.ListField(field=db.StringField()))        # 该用户处理的源站
     is_close = db.BooleanField(default=False)
     is_removed = db.IntField(default=0)
 
@@ -77,6 +118,9 @@ class AdminUser(db.Document):
         return False
 
     def get_id(self):
+        return self.username
+
+    def __unicode__(self):
         return self.username
 
     @property
