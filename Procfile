@@ -1,1 +1,1 @@
-web: gunicorn wsgi:app --log-file -
+web: python quickstart/quickstart.py --log-file -
