@@ -16,6 +16,10 @@ class Config:
     MAIL_USERNAME = 'zyf6112@163.com'
     MAIL_PASSWORD = 'a123456'
 
+    # sentry
+    SENTRY_DSN = 'http://39aeb386bf7842a6b92dd93ff81eb998:c2085725a8b74bdfa8df0e84001c7e1e@127.0.0.1:9000/2'
+    CELERY_SENTRY_DSN = ''
+
     # flask-sqlalchemy配置
     SQLALCHEMY_DATABASE_URI = 'mysql://root:Cxk!51789@localhost/web'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -45,9 +49,6 @@ class Config:
         },
     }
 
-    # sentry config
-    SENTRY_DSN = ""
-    CELERY_SENTRY_DSN = ""
 
     MONGODB_SETTINGS = {
         'db': 'web',
@@ -55,22 +56,22 @@ class Config:
         'port': 27017,
     }
 
-    @staticmethod
-    def init_app(app):
-        app.config["flask_profiler"] = {
-            "enabled": False,
-            "storage": {
-                "engine": "mongodb",
-                "MONGO_URL": "mongodb://%s" % app.config["MONGODB_SETTINGS"]["host"],
-                "DATABASE": app.config["MONGODB_SETTINGS"]["db"],
-                "COLLECTION": "flaskprofile",
-            },
-            "basicAuth": {
-                "enabled": True,
-                "username": "admin",
-                "password": "profile@12308"
-            }
-        }
+    # @staticmethod
+    # def init_app(app):
+        # app.config["flask_profiler"] = {
+            # "enabled": False,
+            # "storage": {
+                # "engine": "mongodb",
+                # "MONGO_URL": "mongodb://%s" % app.config["MONGODB_SETTINGS"]["host"],
+                # "DATABASE": app.config["MONGODB_SETTINGS"]["db"],
+                # "COLLECTION": "flaskprofile",
+            # },
+            # "basicAuth": {
+                # "enabled": True,
+                # "username": "admin",
+                # "password": "profile"
+            # }
+        # }
 
 class ApiLocalConfig(Config):
     DEBUG = True
@@ -83,6 +84,7 @@ class ApiProdConfig(Config):
     pass
 
 class DashboardLocalConfig(ApiLocalConfig):
+    SENTRY_DSN = 'http://3234342f940540b8b7324f2c528d0cb3:2248db2f78ab41f19b6987a7406317a9@150.129.82.175:9000/2'
     pass
 
 class DashboardDevConfig(ApiDevConfig):

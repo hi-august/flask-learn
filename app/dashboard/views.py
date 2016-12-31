@@ -87,6 +87,7 @@ def news_edit(url):
 @login_required
 def get_news_list():
     params = request.values.to_dict()
+    print d
     q = params.get("q", "")
     queryset = {}
     access_log.info(current_user.username)

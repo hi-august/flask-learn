@@ -7,33 +7,34 @@ from fabric.operations import run
 from fabric.context_managers import cd
 
 SERVER_LIST = {
-    "banana": "150.129.82.175",
+    'apple': '150.129.82.175:53387',
 }
 
-env.user = ''
+env.user = 'root'
 env.hosts = SERVER_LIST.values()
 
 
-def deploy(name=""):
-    with cd(''):
+def deploy(name=''):
+    with cd('/root/web/flaskdemo'):
         # 拉代码
+        run('git checkout .')
+        run('git reset .')
         run("git checkout master")
         run("git fetch")
         run("git merge origin/master")
 
         # 重启supervisor
-        run("sudo supervisorctl restart server:%s" % name)
+        run("sudo supervisorctl restart %s" % name)
 
 
 def deploy_all():
     with cd(''):
-        # 拉代码
         run("git checkout master")
         run("git fetch")
         run("git merge origin/master")
 
-        for name in [];
-            run("sudo supervisorctl restart server:%s" % name)
+        for name in ['dashboard',]:
+            run("sudo supervisorctl restart %s" % name)
 
 
 

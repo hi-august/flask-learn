@@ -15,14 +15,16 @@ from logging.handlers import SysLogHandler
 from logging import Formatter, StreamHandler, FileHandler
 
 from flask.ext.mongoengine import MongoEngine
-from flask_sqlalchemy import SQLAlchemy
+# from flask_sqlalchemy import SQLAlchemy
+from raven.contrib.flask import Sentry
 from redis_session import RedisSessionInterface
 from flask.ext.mail import Mail
 mail = Mail()
 
 db = MongoEngine()
-mysql_db = SQLAlchemy()
+# mysql_db = SQLAlchemy()
 
+sentry = Sentry()
 login_manager = LoginManager()
 
 config_name = "%s_%s" % (os.getenv('flask_server') or 'dashboard', os.getenv('flask_config') or 'local')
@@ -67,15 +69,16 @@ def setup_app():
     }
     server_type = config_name.split("_")[0]
     app = servers[server_type]()
-    mysql_db.init_app(app)
+    # mysql_db.init_app(app)
     mail.init_app(app)
     init_logging(app, server_type)
+    sentry.init_app(app, logging=True, level=logging.ERROR)
     return app
 
 def setup_blog_app():
     app = Flask(__name__)
     app.config.from_object(config)
-    config.init_app(app)
+    # config.init_app(app)
     print('run in blog server, use %s' %config.__name__)
 
     from blog import blog as blog_blueprint
@@ -88,7 +91,7 @@ def setup_blog_app():
 def setup_dashboard_app():
     app = Flask(__name__)
     app.config.from_object(config)
-    config.init_app(app)
+    # config.init_app(app)
     print('run in dashboard server, use %s' %config.__name__)
 
     db.init_app(app)
@@ -106,7 +109,7 @@ def setup_dashboard_app():
 def setup_api_app():
     app = Flask(__name__)
     app.config.from_object(config)
-    config.init_app(app)
+    # config.init_app(app)
     print('run in api server, use %s' %config.__name__)
 
     login_manager.init_app(app)
