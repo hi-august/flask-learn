@@ -21,29 +21,45 @@ from app import BASE_DIR
 from flask import current_app, g
 
 
-@dashboard.route('/news/commit/', methods=['GET', 'POST'])
-def news_commit():
+@dashboard.route('/api/news/', methods=['GET', 'POST', 'DELETE'])
+@login_required
+def get_api_news():
+    path = request.args.get('path', '')
     params = request.values.to_dict()
-    params['str_date'] = time.strftime('%Y-%m-%d')
-    commit = params.get('commit', '')
     pk = params.get('pk', '')
-    page = params.get('page', '')
-    access_log.info('%s %s' %(pk, commit))
-    if page:
-        pass
-    if not commit:
+    commit = params.get('commit', '')
+    access_log.info('path: %s, pk: %s, commit: %s' %(path, pk, commit))
+    # 获取具体某一篇文章
+    if request.method == 'GET' and path:
+        news = Jianshu.objects(Q(link_id__icontains=path)).first()
+        return jsonify({'data': news})
+
+    elif request.method == 'DELETE' and pk:
+        try:
+            qset = dict(link_id=pk)
+            access_log.info(qset)
+            Jianshu.objects(**qset).first().delete()
+            return jsonify({'ok': '已经成功删除'})
+        except:
+            pass
+    # 获取文章列表, todo ajax取得文章列表, 分页
+    elif not path and request.method == 'GET':
+        news = Jianshu.objects()
+        ret = parse_page_data(news)
+        return jsonify({'ret': ret})
+    elif pk and not commit and request.method == 'POST':
         return jsonify({'error': u'请添加具体评论'})
-    if commit and pk:
-        queryset = dict(url__icontains=pk)
+    # 添加评论
+    elif pk and commit and request.method == 'POST':
+        queryset = dict(link_id__icontains=pk)
         ret = Jianshu.objects(**queryset).first()
-        ret.commit.append({'commit': commit, 'create_time': datetime.datetime.now()})
-        ret.save()
-    return jsonify({'ok': commit})
-    return render_template('dashboard/base.html')
+        ret.update(add_to_set__commit={'commit': commit, 'create_time': datetime.datetime.now()})
+        return jsonify({'ok': commit})
+
 
 @dashboard.route('/news/<string:url>/delete', methods=['GET'])
 def news_delete(url):
-    queryset = dict(url__icontains=url)
+    queryset = dict(link_id__icontains=url)
     ref = request.referrer
     if request.method == 'GET':
         try:
@@ -57,7 +73,7 @@ def news_delete(url):
 @superuser_required
 def news_edit(url):
     params = request.values.to_dict()
-    queryset = dict(url__icontains=url)
+    queryset = dict(link_id__icontains=url)
     qs = Jianshu.objects(**queryset).first()
     if request.method == 'GET':
         return render_template(
@@ -75,21 +91,38 @@ def news_edit(url):
             # flash
             return redirect(url_for('dashboard.get_news_page', url=url))
 
+@dashboard.route('/news/<string:url>', methods=['GET', 'POST'])
+@login_required
+def get_news(url):
+    #  news = Jianshu.objects(Q(link_id__icontains=url)).first()
+    # return jsonify({'code': 1})
+    if request.method == 'GET':
+        # 用ajax加载
+        #  flash(news.title)
+        return render_template('dashboard/new_page.html')
+        # 直接显示在模板中
+        # return render_template('dashboard/new_page.html', news=news)
+    # elif request.method == 'POST':
+        # return jsonify({'news': news})
+
 @dashboard.route('/news/', methods=['GET'])
 @login_required
 def get_news_list():
     params = request.values.to_dict()
-    q = params.get("q", "")
+    source = params.get('source', '')
+    keyword = params.get('keyword', '')
     queryset = {}
-    access_log.info(current_user.username)
+    # access_log.info(current_user.username)
     # access_log.info(session.viewitems())
     # access_log.info(request.environ)
     # access_log.info(dir(g))
     # access_log.info(current_app.config)
     # access_log.info(request.cookies)
-    if q:
-        queryset.update(title__icontains=q)
+    if keyword:
+        queryset.update(title__icontains=keyword)
 
+    if source:
+        queryset.update(source=source)
     action = params.get("action", "查询")
 
     # 导出csv, 这里可以为响应流(yield)生成
@@ -142,6 +175,7 @@ def get_news_list():
     except:
         news = []
     if news:
+        source = Jianshu.objects.distinct('source')
         # realip = request.environ['REMOTE_ADDR']
         # access_log.info('Your ip is %s' %realip)
         return render_template(
@@ -150,38 +184,10 @@ def get_news_list():
             page=parse_page_data(news),
             # 一些搜索条件, 一般可以加到value里
             condition=params,
+            source=source,
         )
     else:
         return jsonify({'error': 1})
-    # return jsonify({'login': 'success'})
-
-@dashboard.route('/api/news/', methods=['GET'])
-@login_required
-def get_api_news_page():
-    url = request.args.get('path', '')
-    if request.method == 'GET' and url:
-        news = Jianshu.objects(Q(url__icontains=url)).first()
-        return jsonify({'data': news})
-    if 1:
-        qset = {}
-        news = Jianshu.objects(**qset)
-        ret = parse_page_data(news)
-        return jsonify({'ret': ret})
-
-@dashboard.route('/news/<string:url>', methods=['GET', 'POST'])
-@login_required
-def get_news_page(url):
-    news = Jianshu.objects(Q(url__icontains=url)).first()
-    # return jsonify({'code': 1})
-    if request.method == 'GET':
-        # 用ajax加载
-        flash(news.title)
-        return render_template('dashboard/new_page.html')
-        # 直接显示在模板中
-        # return render_template('dashboard/new_page.html', news=news)
-    elif request.method == 'POST':
-        return jsonify({'news': news})
-
 
 class LoginInView(MethodView):
     def get(self):
@@ -278,7 +284,7 @@ def ckupload():
         fname, fext = os.path.splitext(fileobj.filename)
         rnd_name = '%s%s' % (gen_rnd_filename(), fext)
         filepath = os.path.join(dashboard.static_folder, rnd_name)
-        access_log.info(filepath)
+        # access_log.info(filepath)
 
         # 检查路径是否存在，不存在则创建
         dirname = os.path.dirname(filepath)
@@ -293,7 +299,7 @@ def ckupload():
         if not error:
             fileobj.save(filepath)
             url = url_for('dashboard.static', filename='%s' % (rnd_name))
-            access_log.info(url)
+            # access_log.info(url)
     else:
         error = 'post error'
 

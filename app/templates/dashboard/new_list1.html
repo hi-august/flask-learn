@@ -20,14 +20,16 @@
                     <div class="row">
                         <div class="form-group col-md-4">
                             <label for="sourceSite" class="sr-only">Search</label>
-                            <input type="text" class="form-control" id="" placeholder="Search" name="q" value="{{condition.q}}">
+                            <input type="text" class="form-control" id="" placeholder="Search" name="keyword" value="{{condition.keyword}}">
                         </div>
                         <div class="form-group col-md-2">
                             <label for="sourceSite" class="sr-only">source</label>
-                            <select class="form-control" name="url">
+                            <select class="form-control" name="source">
                                 <option value="">源站</option>
-                                <option value="jianshu">简书</option>
-                                <option value="douban">豆瓣</option>
+                                {% for x in source %}
+                                <option value="{{ x }}" {% if x == condition.source %} selected="selected" {% endif %}>{{ x }}</option>
+                                {{condition.source}}
+                                {% endfor %}
                             </select>
                         </div>
                         <div class="form-group  col-md-2">
@@ -75,16 +77,16 @@
                 {%for new in page["items"]%}
                 <tr>
                     <td>
-                        <h5><a href="{{url_for('dashboard.get_news_list')}}{{new.url.split('/')[-1]}}">{{new.title}}</a></h5>
+                        <h5><a href="{{url_for('dashboard.get_news_list')}}{{new.link_id}}">{{new.title}}</a></h5>
                     </td>
                     <td>
                         {{new.author}}
                     </td>
                     <td>
-                        <a class='edit' data-trigger="" href="{{ url_for('dashboard.get_news_list') }}{{new.url.split('/')[-1]}}/edit">edit</a>
+                        <a class='edit' data-trigger="" href="{{ url_for('dashboard.get_news_list') }}{{new.link_id}}/edit">edit</a>
                     </td>
                     <td>
-                        <a class='delete' data-trigger="confirm" href="{{ url_for('dashboard.get_news_list') }}{{new.url.split('/')[-1]}}/delete">delete</a>
+                        <a class='delete' data-trigger="confirm" href="{{ url_for('dashboard.get_news_list') }}{{new.link_id}}/delete">delete</a>
                     </td>
                 </tr>
                 {%endfor%}
@@ -124,6 +126,16 @@
 </body>
 {% endblock %} {% block script %} {{ super() }}
 <script type='text/javascript'>
+// 这里相当于自动提交
+function search(page) {
+    // 相当于点击某个链接页
+    // 这里可以接受一个或者多个参数
+    // 设置value
+    $("input[name='page']").val(page);
+    // 执行表单自动提交
+    // 由condition保留一些搜索历史
+    $(".query-form").submit();
+};
     $(".form_datetime").datetimepicker({
         format: "yyyy-mm-dd",
         autoclose: true,
@@ -171,16 +183,6 @@ $('.delete').click(function() {
 //     }
 //   })
 // })
-// 这里相当于自动提交
-function search(page) {
-    // 相当于点击某个链接页
-    // 这里可以接受一个或者多个参数
-    // 设置value
-    $("input[name='page']").val(page);
-    // 执行表单自动提交
-    // 由condition保留一些搜索历史
-    $(".query-form").submit();
-};
 
 // String.prototype.replaceAll = function (exp, newStr) {
 // return this.replace(new RegExp(exp, "gm"), newStr);

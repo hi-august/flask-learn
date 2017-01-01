@@ -7,8 +7,8 @@
             <div class='col-md-12 column'>
               <br>
               <ol class="breadcrumb">
-                  <li><a href="#">Home</a></li>
-                  <li><a href="#">Library</a></li>
+                  <li><a href="{{ url_for('dashboard.get_news_list') }}">Home</a></li>
+                  <li><a href='#'>Library</a></li>
                   <li class="active">Data</li>
               </ol>
                 <h3 class='text-center title'></h3>
@@ -26,7 +26,7 @@
         <div class='row clearfix'>
             <div class='col-md-12 column'>
                 <p>
-                    <a href="javascript:;" class="get_author" pk="">ajax_get_author</a>
+                    <a href="javascript:;" class="get_author" pk="">delete</a>
                     <br/>
                     <a data-trigger="modal" href="" data-title="title" class="btn" style="padding:0px;">title</a>
                     <br/>
@@ -69,15 +69,37 @@
 </body>
 {% endblock %} {% block script %} {{ super() }}
 <script type='text/javascript'>
+// 浏览器加载页面基础内容后执行
+$(function() {
+    $.ajax({
+        url: '/api/news/',
+        type: 'GET',
+        data: {
+            path: window.location.pathname.split('/')[2],
+            now: Date.now()
+        },
+        dataType: 'json',
+        success: function(r) {
+            $('.title').text(r.data.title);
+            $('.content').html(r.data.content);
+            $('.url').text(r.data.url);
+            $('.url').attr('href', r.data.url);
+            $('.get_author').attr('pk', r.data.link_id);
+            $('.author').text(r.data.author);
+            $('img').addClass('img-responsive');
+        }
+    })
+});
 $('.modal_commit').click(function() {
     var commit = $("textarea[name='commit']").val();
+    console.log(commit);
     $.ajax({
         cache: false,
-        type: "POST",
-        url: '/news/commit/',
+        type: 'POST',
+        url: '/api/news/',
         data: {
             commit: commit,
-            pk: window.location.pathname.split('/')[2]
+            pk : window.location.pathname.split('/')[2],
         },
         async: false,
         error: function(request) {
@@ -89,7 +111,7 @@ $('.modal_commit').click(function() {
                 $('#myModal').modal('hide');
             }
             if (data.error){
-                layer.msg(data.error);
+                // layer.msg(data.error);
                 $.scojs_message(data.error, $.scojs_message.TYPE_ERROR);
             }
             // 提示信息
@@ -106,7 +128,7 @@ $(".add-commit").click(function() {
         $.ajax({
             cache: false,
             type: "POST",
-            url: '/news/commit/',
+            url: '/api/news/',
             data: {
                 commit: text,
                 pk: window.location.pathname.split('/')[2]
@@ -122,84 +144,69 @@ $(".add-commit").click(function() {
     });
 });
 // ajax加载后台数据post方法
-// $('.get_author').click(function(){
-//   var t = $(this).attr('pk');
-//   $.ajax({
-//     url: '/news/' + t,
-//     type: 'POST',
-//     success: function(r){
-//       console.log(r.news);
-//     },
-//     error: function(r){
-//       alert('Connection Error!');
-//     },
-//   })
-// });
-
-$(function() {
-    function add(e) {
-        var ndata = {
-            a: $('input[name="a"]').val(),
-            b: $('input[name="b"]').val(),
-        };
-        $.ajax({
-            url: '/add',
-            type: 'POST',
-            data: JSON.stringify(ndata),
-            contentType: 'application/json; charset=UTF-8',
-            success: function(r) {
-                if (r.error) {
-                    alert(r.error);
-                }
-                if (r.result) {
-                    $('#result').text(r.result);
-                    // alert(r.result);
-                }
-            },
-        });
-    };
-    $('#calculate').bind('click', add);
-});
-
-$(function() {
-    function add1(e) {
-        var ndata = {
-            a: $('input[name="a1"]').val(),
-            b: $('input[name="b1"]').val(),
-            now: Date.now(),
-        };
-        $.getJSON('/add1', ndata, function(r) {
-            if (r.result) {
-                $('#result1').text(r.result);
-            }
-            if (r.error) {
-                alert('You can input numbers');
-            }
-        })
-    };
-    $('#calculate1').bind('click', add1);
-});
-// 浏览器加载页面基础内容后执行
-$(function() {
-    $.ajax({
-        url: '/api/news',
-        type: 'GET',
-        data: {
-            path: window.location.pathname.split('/')[2],
-            now: Date.now()
-        },
-        dataType: 'json',
-        success: function(r) {
-            $('.title').text(r.data.title);
-            $('.content').html(r.data.content);
-            $('.url').text(r.data.url);
-            $('.url').attr('href', r.data.url);
-            $('.get_author').attr('pk', r.data.url.split('/')[4]);
-            $('.author').text(r.data.author);
-            $('img').addClass('img-responsive');
+$('.get_author').click(function(){
+  var pk  = $(this).attr('pk');
+  console.log(pk);
+  $.ajax({
+    url: '/api/news/',
+    type: 'DELETE',
+    data: {
+        pk: pk,
+    },
+    success: function(r){
+        if (r.ok) {
+            $.scojs_message(r.ok, $.scojs_message.TYPE_OK);
         }
-    })
+    },
+    error: function(r){
+      alert('Connection Error!');
+    },
+  })
 });
+//
+//   $(function() {
+//       function add(e) {
+//           var ndata = {
+//               a: $('input[name="a"]').val(),
+//               b: $('input[name="b"]').val(),
+//           };
+//           $.ajax({
+//               url: '/add',
+//               type: 'POST',
+//               data: JSON.stringify(ndata),
+//               contentType: 'application/json; charset=UTF-8',
+//               success: function(r) {
+//                   if (r.error) {
+//                       alert(r.error);
+//                   }
+//                   if (r.result) {
+//                       $('#result').text(r.result);
+//                       // alert(r.result);
+//                   }
+//               },
+//           });
+//       };
+//       $('#calculate').bind('click', add);
+//   });
+//
+// $(function() {
+//     function add1(e) {
+//         var ndata = {
+//             a: $('input[name="a1"]').val(),
+//             b: $('input[name="b1"]').val(),
+//             now: Date.now(),
+//         };
+//         $.getJSON('/add1', ndata, function(r) {
+//             if (r.result) {
+//                 $('#result1').text(r.result);
+//             }
+//             if (r.error) {
+//                 alert('You can input numbers');
+//             }
+//         })
+//     };
+//     $('#calculate1').bind('click', add1);
+// });
 </script>
 {% endblock %}
 
