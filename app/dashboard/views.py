@@ -20,34 +20,26 @@ import datetime
 from app import BASE_DIR
 from flask import current_app, g
 
-@dashboard.route('/', methods=['GET'])
-def index():
-    return redirect(url_for('dashboard.get_news_list'))
 
-def parse_page_data(qs):
-    total = qs.count()
+@dashboard.route('/news/commit/', methods=['GET', 'POST'])
+def news_commit():
     params = request.values.to_dict()
-    try:
-        page = int(params.get("page"))
-    except TypeError:
-        page = 1
-    if page < 1:
-        page = 1
-    page_size = int(params.get("page_size", 20))
-    page_num = int(math.ceil(total*1.0/page_size))
-    skip = (page-1)*page_size
-
-    cur_range = range(max(1, page-8),  min(max(1, page-8)+16, page_num+1))
-    return {
-        "total": total,
-        "page_size": page_size,         # 每页page_size条记录
-        "page_count": page_num,         # 总共有page_num页
-        "cur_page": page,               # 当前页
-        "previous": max(0, page-1),
-        "next": min(page+1, page_num),
-        "items": qs[skip: skip+page_size],
-        "range": cur_range,             # 分页按钮显示的范围
-    }
+    params['str_date'] = time.strftime('%Y-%m-%d')
+    commit = params.get('commit', '')
+    pk = params.get('pk', '')
+    page = params.get('page', '')
+    access_log.info('%s %s' %(pk, commit))
+    if page:
+        pass
+    if not commit:
+        return jsonify({'error': u'请添加具体评论'})
+    if commit and pk:
+        queryset = dict(url__icontains=pk)
+        ret = Jianshu.objects(**queryset).first()
+        ret.commit.append({'commit': commit, 'create_time': datetime.datetime.now()})
+        ret.save()
+    return jsonify({'ok': commit})
+    return render_template('dashboard/base.html')
 
 @dashboard.route('/news/<string:url>/delete', methods=['GET'])
 def news_delete(url):
@@ -87,7 +79,6 @@ def news_edit(url):
 @login_required
 def get_news_list():
     params = request.values.to_dict()
-    print d
     q = params.get("q", "")
     queryset = {}
     access_log.info(current_user.username)
@@ -343,3 +334,32 @@ def test_dashboard():
     return render_template('dashboard/base.html')
     # access_log.info('dashboard test ok')
     # return jsonify({'code': 'ok'})
+
+def parse_page_data(qs):
+    total = qs.count()
+    params = request.values.to_dict()
+    try:
+        page = int(params.get("page"))
+    except TypeError:
+        page = 1
+    if page < 1:
+        page = 1
+    page_size = int(params.get("page_size", 20))
+    page_num = int(math.ceil(total*1.0/page_size))
+    skip = (page-1)*page_size
+
+    cur_range = range(max(1, page-8),  min(max(1, page-8)+16, page_num+1))
+    return {
+        "total": total,
+        "page_size": page_size,         # 每页page_size条记录
+        "page_count": page_num,         # 总共有page_num页
+        "cur_page": page,               # 当前页
+        "previous": max(0, page-1),
+        "next": min(page+1, page_num),
+        "items": qs[skip: skip+page_size],
+        "range": cur_range,             # 分页按钮显示的范围
+    }
+
+@dashboard.route('/', methods=['GET'])
+def index():
+    return redirect(url_for('dashboard.get_news_list'))

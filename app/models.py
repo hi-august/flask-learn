@@ -48,6 +48,7 @@ class Jianshu(db.Document):
     catalogue = db.StringField()
     source = db.StringField()
     update_datetime = db.DateTimeField()
+    create_datetime = db.DateTimeField()
     # commit = db.ListField()
     commit = db.ListField(field=db.ListField(field=db.StringField()))
     is_show = db.IntField(default=0)

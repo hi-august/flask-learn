@@ -74,7 +74,7 @@ $('.modal_commit').click(function() {
     $.ajax({
         cache: false,
         type: "POST",
-        url: '/test',
+        url: '/news/commit/',
         data: {
             commit: commit,
             pk: window.location.pathname.split('/')[2]
@@ -106,7 +106,7 @@ $(".add-commit").click(function() {
         $.ajax({
             cache: false,
             type: "POST",
-            url: '/test',
+            url: '/news/commit/',
             data: {
                 commit: text,
                 pk: window.location.pathname.split('/')[2]
