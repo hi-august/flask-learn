@@ -106,7 +106,7 @@ def get_news(url):
         # return jsonify({'news': news})
 
 @dashboard.route('/news/', methods=['GET'])
-@login_required
+# @login_required
 def get_news_list():
     params = request.values.to_dict()
     source = params.get('source', '')

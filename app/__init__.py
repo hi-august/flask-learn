@@ -4,6 +4,9 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+# monkey 这里会替换原有的标准, 小心使用
+# from gevent import monkey
+# monkey.patch_all()
 # celery任务队列, 邮件, sentry错误
 from flask import Flask
 from flask.ext.login import LoginManager
@@ -22,6 +25,7 @@ from flask.ext.mail import Mail
 mail = Mail()
 
 db = MongoEngine()
+db.connect(db='web', connect=False)
 # mysql_db = SQLAlchemy()
 
 sentry = Sentry()

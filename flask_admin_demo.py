@@ -54,9 +54,9 @@ class UserView(ModelView):
     column_editable_list = ['username', 'create_datetime']
 
 class Jianshuview(ModelView):
-    column_filters = ['title', 'author']
-    column_searchable_list = ('title', 'author')
-    column_list = ['title', 'category', 'author', 'link_id', 'commit']
+    column_filters = ['title', 'author', 'source']
+    column_searchable_list = ('title', 'author', 'source')
+    column_list = ['title', 'source', 'author', 'link_id']
     column_editable_list = ['title', ]
     # 分页条数
     page_size = 50
@@ -79,7 +79,7 @@ class Jianshuview(ModelView):
 def index():
     return '<a href="/admin/">Click me to get to Admin!</a>'
 path = op.join(op.dirname(__file__), 'static')
-admin.add_view(FileAdmin('/Users/Augutst/stackflow/tbus/flaskdemo/app/static', '/static/', name='Static'))
+# admin.add_view(FileAdmin('/Users/Augutst/stackflow/tbus/flaskdemo/app/static', '/static/', name='Static'))
 
 admin.add_view(MyView(name='Hello 1', endpoint='test1', category='Test'))
 admin.add_view(MyView(name='Hello 2', endpoint='test2', category='Test'))
@@ -98,4 +98,4 @@ admin.add_view(PostView(Post))
 # admin.add_view(PostView1(Post, db.session, category='Mysql'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run('0.0.0.0', debug=True)

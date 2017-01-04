@@ -12,5 +12,5 @@ api_server = HTTPServer(WSGIContainer(app))
 # 监听端口,绑定socket事件
 api_server.bind(port)
 # 开启4个进程
-api_server.start(4)
+api_server.start(8)
 IOLoop.current().start()
