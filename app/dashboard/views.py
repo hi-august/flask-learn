@@ -15,6 +15,7 @@ import csv
 import time
 import StringIO
 import os
+from subprocess import check_output
 import random
 import datetime
 from app import BASE_DIR
@@ -58,13 +59,14 @@ def get_api_news():
 
 
 @dashboard.route('/news/<string:url>/delete', methods=['GET'])
+@superuser_required
 def news_delete(url):
     queryset = dict(link_id__icontains=url)
     ref = request.referrer
     if request.method == 'GET':
         try:
             Jianshu.objects(**queryset).first().delete()
-            flash(u'已经成功删除')
+            flash(u'已经成功删除了')
             return redirect(ref)
         except:
             pass
@@ -191,8 +193,8 @@ def get_news_list():
 
 class LoginInView(MethodView):
     def get(self):
-        # if not current_user.is_anonymous:
-        #     return redirect(url_for("dashboard.index"))
+        if not current_user.is_anonymous:
+            return redirect(url_for("dashboard.index"))
         # else:
         #     flask_login.logout_user()
         return render_template('dashboard/login.html')
@@ -319,27 +321,6 @@ def logout():
     return redirect(url_for('dashboard.login'))
     # return jsonify({'logout': 'success'})
 
-@dashboard.route('/test/', methods=['GET', 'POST'])
-def test_dashboard():
-    params = request.values.to_dict()
-    params['str_date'] = time.strftime('%Y-%m-%d')
-    commit = params.get('commit', '')
-    pk = params.get('pk', '')
-    page = params.get('page', '')
-    access_log.info('%s %s' %(pk, commit))
-    if page:
-        pass
-    if not commit:
-        return jsonify({'error': u'请添加具体评论'})
-    if commit and pk:
-        queryset = dict(url__icontains=pk)
-        ret = Jianshu.objects(**queryset).first()
-        ret.commit.append({'commit': commit, 'create_time': datetime.datetime.now()})
-        ret.save()
-    return jsonify({'ok': commit})
-    return render_template('dashboard/base.html')
-    # access_log.info('dashboard test ok')
-    # return jsonify({'code': 'ok'})
 
 def parse_page_data(qs):
     total = qs.count()
@@ -369,3 +350,13 @@ def parse_page_data(qs):
 @dashboard.route('/', methods=['GET'])
 def index():
     return redirect(url_for('dashboard.get_news_list'))
+
+@dashboard.route('/async/1/', methods=['GET'])
+def sleep_async():
+    time.sleep(1.2)
+    return 'sleep 30s'
+
+@dashboard.route('/test/', methods=['GET', 'POST'])
+def test_dashboard():
+    out = check_output('ifconfig')
+    return out

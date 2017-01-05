@@ -8,18 +8,22 @@ from flask.ext.admin.contrib.sqla import ModelView as SModelView
 import os.path as op
 from app.models import AdminUser, Jianshu, Category, Post
 # from app.blog.models import db, Author, MysqlJianshu, Post, Category, User, Book
-from app import setup_blog_app
+from app import setup_app
 from flask.ext.login import current_user
 from mongoengine import connect
 
+
 DEFAULT_CONNECTION_NAME = connect('web')
 
-# todo, auth验证, 2.外键数据管理
-app = setup_blog_app()
+# done, auth验证
+# auth通过原有的登陆进行拓展, 主要检查current_user的状态
+# todo 2.外键数据管理
+app = setup_app()
 # db.init_app(app)
 # 定义程序名称
 app.config['MONGODB_SETTINGS'] = {'db': 'web', 'alias':'default'}
 admin = Admin(app, name='blog')
+
 
 class MyView(BaseView):
     # 127.0.0.1:5000/admin
@@ -40,6 +44,14 @@ class PostView(ModelView):
     pass
 
 class UserView(ModelView):
+    # 只有管理员用户可见
+    def is_accessible(self):
+        flag = not current_user.is_anonymous
+        try:
+            flag = current_user.is_superuser
+        except:
+            flag = False
+        return flag
     # 指定过滤器
     column_filters = ['username']
     # 指定可搜索字段
@@ -54,6 +66,9 @@ class UserView(ModelView):
     column_editable_list = ['username', 'create_datetime']
 
 class Jianshuview(ModelView):
+    # 登陆可见
+    def is_accessible(self):
+        return not current_user.is_anonymous
     column_filters = ['title', 'author', 'source']
     column_searchable_list = ('title', 'author', 'source')
     column_list = ['title', 'source', 'author', 'link_id']

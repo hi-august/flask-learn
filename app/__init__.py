@@ -21,6 +21,9 @@ from flask.ext.mongoengine import MongoEngine
 # from flask_sqlalchemy import SQLAlchemy
 from raven.contrib.flask import Sentry
 from redis_session import RedisSessionInterface
+from celery import Celery, platforms
+platforms.C_FORCE_ROOT = True    # celery
+
 from flask.ext.mail import Mail
 mail = Mail()
 
@@ -34,10 +37,23 @@ login_manager = LoginManager()
 config_name = "%s_%s" % (os.getenv('flask_server') or 'dashboard', os.getenv('flask_config') or 'local')
 config = config_mapping[config_name]
 
+celery = Celery(__name__, broker=config.CELERY_BROKER_URL)
+
 BASE_DIR = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
 
 access_log = logging.getLogger('access')
 
+def init_celery(app):
+    TaskBase = celery.Task
+    celery.conf.update(app.config)
+
+    class ContextTask(TaskBase):
+        abstract = True
+
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+    celery.Task = ContextTask
 
 def init_logging(app, server_type):
     fmt = Formatter('[%(asctime)s] %(levelname)s: %(message)s')
@@ -74,6 +90,7 @@ def setup_app():
     server_type = config_name.split("_")[0]
     app = servers[server_type]()
     # mysql_db.init_app(app)
+    celery.conf.update(app.config)
     mail.init_app(app)
     init_logging(app, server_type)
     sentry.init_app(app, logging=True, level=logging.ERROR)
@@ -85,8 +102,11 @@ def setup_blog_app():
     # config.init_app(app)
     print('run in blog server, use %s' %config.__name__)
 
-    from blog import blog as blog_blueprint
-    app.register_blueprint(blog_blueprint)
+    # from blog import blog as blog_blueprint
+    db.init_app(app)
+    login_manager.init_app(app)
+    from admin import app as flask_admin_blueprint
+    app.register_blueprint(flask_admin_blueprint)
     app.secret_key = 'A0Zr98j/3yX R~XHH]LWX/,?RT'
 
     return app

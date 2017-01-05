@@ -3,14 +3,11 @@
 import threading
 
 from functools import wraps
-from flask import current_app, flash
+from flask import current_app, flash, url_for
 from flask.ext.login import current_user
 
-# 异步调用
-# @async
-# def print():
-    # print 233
 
+# 异步线程
 def async(func):
     def _wrap(*args, **kwargs):
         t = threading.Thread(target=func, args=args, kwargs=kwargs)

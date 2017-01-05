@@ -19,8 +19,11 @@ bind = '0.0.0.0:9000'
 
 #启动的进程数
 # workers = multiprocessing.cpu_count() * 2 + 1
+# 用monkey patch实现单进程异步响应
+# todo 使用tornado实现异步响应
 workers = 2
 worker_class = 'gunicorn.workers.ggevent.GeventWorker'
+# worker_class = 'gevent'
 
 x_forwarded_for_header = 'X-FORWARDED-FOR'
 # secure_scheme_headers = {

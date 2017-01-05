@@ -17,8 +17,6 @@ env.hosts = SERVER_LIST.values()
 def deploy(name=''):
     with cd('/root/web/flaskdemo'):
         # 拉代码
-        run('git checkout .')
-        run('git reset .')
         run("git checkout master")
         run("git fetch")
         run("git merge origin/master")
