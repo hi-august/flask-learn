@@ -38,7 +38,12 @@
                     <a href="#">信息</a>
                 </li>
                 <li class="pull-right">
-                    <a class='logout' data-trigger='confirm' href="{{ url_for('dashboard.logout') }}">退出 </a>
+                    <!-- <a class='logout' data-trigger='confirm' href="{{ url_for('dashboard.logout') }}">退出 </a>a> -->
+                    {% if not current_user.is_anonymous %}
+                    <p>欢迎你! {{ current_user.username }}&nbsp;&nbsp;&nbsp;<a class='logout' data-trigger='confirm' href="{{ url_for('dashboard.logout') }}">退出</a> </p>
+                    {% else %}
+                    <p><a href="{{ url_for('dashboard.login') }}">请登录!</a></p>
+                    {% endif %}
                 </li>
                 </ul>
         </div>

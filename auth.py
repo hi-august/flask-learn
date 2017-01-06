@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-from flask import flash, jsonify, render_template
+from flask import flash, jsonify, render_template, redirect, url_for
 from app import login_manager
 from app.models import AdminUser
 from app.utils import md5
@@ -26,7 +26,8 @@ def load_admin(username):
 @login_manager.unauthorized_handler
 def unauthorized():
     flash('请登陆')
-    return render_template('dashboard/base.html')
+    return redirect(url_for('dashboard.login'))
+    # return render_template('dashboard/unauthorize.html')
 
 @login_manager.request_loader
 def request_loader(request):
