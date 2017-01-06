@@ -10,6 +10,9 @@ sys.setdefaultencoding('utf-8')
 # celery任务队列, 邮件, sentry错误
 from flask import Flask
 from flask.ext.login import LoginManager
+from flask_admin import Admin
+from flask_debugtoolbar import DebugToolbarExtension
+from flask.ext.cache import Cache
 
 from config import config_mapping
 import redis
@@ -85,31 +88,34 @@ def setup_app():
     servers = {
         'api': setup_api_app,
         'dashboard': setup_dashboard_app,
-        'blog': setup_blog_app,
+        # 'blog': setup_blog_app,
     }
     server_type = config_name.split("_")[0]
     app = servers[server_type]()
     # mysql_db.init_app(app)
-    celery.conf.update(app.config)
+    init_celery(app)
+    from cache import cache
+    cache.init_app(app)
     mail.init_app(app)
     init_logging(app, server_type)
     sentry.init_app(app, logging=True, level=logging.ERROR)
     return app
 
-def setup_blog_app():
-    app = Flask(__name__)
-    app.config.from_object(config)
-    # config.init_app(app)
-    print('run in blog server, use %s' %config.__name__)
+# def setup_blog_app():
+    # app = Flask(__name__)
+    # app.config.from_object(config)
+    # # config.init_app(app)
+    # print('run in blog server, use %s' %config.__name__)
 
-    # from blog import blog as blog_blueprint
-    db.init_app(app)
-    login_manager.init_app(app)
-    from admin import app as flask_admin_blueprint
-    app.register_blueprint(flask_admin_blueprint)
-    app.secret_key = 'A0Zr98j/3yX R~XHH]LWX/,?RT'
+    # # from blog import blog as blog_blueprint
+    # db.init_app(app)
+    # login_manager.init_app(app)
+    # 这里作为一个蓝图导入
+    # from admin import app as flask_admin_blueprint
+    # app.register_blueprint(flask_admin_blueprint)
+    # app.secret_key = 'A0Zr98j/3yX R~XHH]LWX/,?RT'
 
-    return app
+    # return app
 
 
 def setup_dashboard_app():
@@ -120,10 +126,16 @@ def setup_dashboard_app():
 
     db.init_app(app)
     login_manager.init_app(app)
+    # 集成到dashboard, auth验证
+    from app.admin_dashboard import UserView
+    from app.models import AdminUser
+    admin = Admin(app, 'Home')
+    admin.add_view(UserView(AdminUser))
     from dashboard import dashboard as dashboard_blueprint
     app.register_blueprint(dashboard_blueprint)
     app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
+    toolbar = DebugToolbarExtension(app)
     rset = app.config["REDIS_SETTIGNS"]["session"]
     r = redis.Redis(host=rset["host"], port=rset["port"], db=rset["db"])
     app.session_interface = RedisSessionInterface(redis=r)

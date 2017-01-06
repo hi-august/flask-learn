@@ -9,6 +9,18 @@ class Config:
     DEBUG = False
     PRESERVE_CONTEXT_ON_EXCEPTION = False
 
+    # cache
+    CACHE_TYPE= 'redis'
+    CACHE_KEY_PREFIX = 'fcache'
+    CACHE_REDIS_HOST = 'localhost'
+    CACHE_REDIS_PORT = '6379'
+    CACHE_REDIS_URL = 'redis://localhost:6379'
+    CACHE_REDIS_DB = 2
+
+    # debugtoorbar
+    DEBUG_TB_HOSTS = '127.0.0.1'
+    DEBUG_TB_INTERCEPT_REDIRECTS = False
+
     # mail config
     MAIL_SERVER = 'smtp.163.com'
     MAIL_PORT = 25

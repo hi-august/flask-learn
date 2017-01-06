@@ -7,6 +7,7 @@ from app.models import AdminUser, Jianshu
 from app.dashboard import dashboard
 from app import access_log
 from app.utils import md5
+from app.cache import cache
 from flask.ext.login import login_required, current_user, login_user
 from app.decorators import superuser_required
 from mongoengine import Q
@@ -20,7 +21,11 @@ import random
 import datetime
 from app import BASE_DIR
 from flask import current_app, g
+import urllib
 
+def make_cache_key(*args, **kwargs):
+    key = urllib.urlencode(request.values.to_dict())
+    return md5(key)
 
 @dashboard.route('/api/news/', methods=['GET', 'POST', 'DELETE'])
 @login_required
@@ -109,6 +114,8 @@ def get_news(url):
 
 @dashboard.route('/news/', methods=['GET'])
 # @login_required
+# 缓存
+@cache.cached(timeout=300, key_prefix=make_cache_key, unless=None)
 def get_news_list():
     params = request.values.to_dict()
     source = params.get('source', '')
@@ -346,6 +353,7 @@ def parse_page_data(qs):
         "items": qs[skip: skip+page_size],
         "range": cur_range,             # 分页按钮显示的范围
     }
+
 
 @dashboard.route('/', methods=['GET'])
 def index():
