@@ -11,9 +11,6 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 app = setup_app()
 manager = Manager(app)
 
-# flask 中分为应用上下文和请求上下文
-# 请求上下文request, session
-# 应用上下文g, current_app
 def make_shell_context():
     import app.models as m
     return dict(app=app, db=db, m=m)

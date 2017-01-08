@@ -68,6 +68,7 @@
                 <tr>
                     <th>标题</th>
                     <th>作者</th>
+                    <th>更新时间</th>
                     <th>编辑</th>
                     <th>删除</th>
                 </tr>
@@ -81,6 +82,9 @@
                     </td>
                     <td>
                         {{new.author}}
+                    </td>
+                    <td>
+                        {{ new.update_datetime|format_datetime }}
                     </td>
                     <td>
                         <a class='edit' data-trigger="" href="{{ url_for('dashboard.get_news_list') }}{{new.link_id}}/edit">edit</a>

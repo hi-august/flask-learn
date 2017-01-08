@@ -10,7 +10,7 @@ class RegistrationForm(Form):
     email = TextField('邮箱地址', [validators.Length(min=6, max=35)])
     password = PasswordField('请输入密码', [
         validators.Required(),
-        validators.EqualTo('confirm', message='Passwords must match')
+        validators.EqualTo('confirm', message='密码不一致!')
     ])
     confirm = PasswordField('确认密码')
     accept_tos = BooleanField('同意协议', [validators.Required()])

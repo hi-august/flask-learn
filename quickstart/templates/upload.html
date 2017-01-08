@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload</title>
+    <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap.min.css">
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+<form action="{{url_for('upload_file')}}" method="POST" enctype="multipart/form-data">
+    <input class='form-control', type="file" id="media" name="media">
+    <input class='form-control' type="submit">
+</form>
+<div class="progress" style="display: none;">
+    <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+        0%
+    </div>
+</div>
+<script type="text/javascript">
+    $('form').on('submit', function (event) {
+        // 显示进度条
+        $('.progress').css('display', 'block');
+        // 阻止元素发生默认的行为，此处用来阻止对表单的提交
+        event.preventDefault();
+        var formData = new FormData(this);
+        // jQuery Ajax 上传文件，关键在于设置：processData 和 contentType
+        $.ajax({
+            xhr: function () {
+                var xhr = new XMLHttpRequest();
+                xhr.upload.addEventListener('progress', function (e) {
+                    if (e.lengthComputable) {
+                        var percent = Math.round(e.loaded * 100 / e.total);
+                        $('.progress-bar').attr('aria-valuenow', percent).css('width', percent + '%').text(percent + '%');
+                    }
+                });
+                return xhr;
+            },
+            type: 'POST',
+            url: '/upload/',
+            cache: false,
+            data: formData,
+            // 告诉 jQuery 不要去处理发送的数据
+            processData: false,
+            // 告诉 jQuery 不要去设置 Content-Type 请求头
+            // 因为这里是由 <form> 表单构造的 FormData 对象，且已经声明了属性 enctype="multipart/form-data"，所以设置为 false
+            contentType: false
+        }).done(function (res) {
+          console.log('上传成功');
+            //alert('上传成功!');
+        }).fail(function (res) {
+            alert('上传失败!');
+        });
+    });
+</script>
+</body>
+</html>

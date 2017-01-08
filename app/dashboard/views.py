@@ -180,7 +180,7 @@ def get_news_list():
 
     # parse_page_data定制分页
     try:
-        news = Jianshu.objects(**queryset)
+        news = Jianshu.objects(**queryset).order_by('-update_datetime')
     except:
         news = []
     if news:
@@ -228,7 +228,7 @@ class LoginInView(MethodView):
         try:
             access_log.info('%s %s' %(name, md5(pwd)))
             u = AdminUser.objects.get(username=name, password=md5(pwd), is_close=False)
-            flash("登陆成功", "info")
+            #  flash("登陆成功", "info")
             flask_login.login_user(u)
             return redirect(url_for('dashboard.index'))
         except AdminUser.DoesNotExist:

@@ -3,16 +3,48 @@
 <head>
 </head>
 <body>
+    <form id="emit" method="POST" action='#'>
+        <input type="text" name="emit_data" id="emit_data" placeholder="Message">
+        <input type="submit" value="Echo">
+    </form>
+    <h2>Receive:</h2>
+    <div id="log"></div>
 </body>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
 <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
 <script type="text/javascript" charset="utf-8">
     var socket = io.connect('http://' + document.domain + ':' + location.port);
+    // 监听connect事件
     socket.on('connect', function() {
+        // 发送信息到绑定的my_event事件
         socket.emit('my_event', {data: 'I\'m connected!'});
+        return false;
     });
+    // 接收my_response事件信息
     socket.on('my_response', function(msg) {
-        $('body').html(msg);
+        $('#log').append('<br>' + $('<div/>').text('Received #' +  ': ' + msg.data).html());
+        return false;
     });
+    // 从表单里获取数据, 发送到信息到my_event
+    // 自动添加的manage房间里
+    socket.emit('join', {room: 'manage'});
+    $('form#emit').submit(function(event) {
+        socket.emit('room_msg', {room: 'manage', data: $('#emit_data').val()});
+        return false;
+    });
+    // 前端请求
+var chat = io.connect('ws://localhost:5000');   // 通过指定的ip和port连接后端
+chat.on('connect', function(data) {
+    chat.emit('message',{msg: '{{roomid}}'},function(){     //连接建立之后，向后端发送标识符
+        room = io.connect('ws://localhost:5000/{{roomid}}');    //后端生成对应的room，并提供连接
+        room.on('response',function(data){                  //监听后端的事件
+            console.log(data);
+        });
+        $('form#emit').submit(function(event) {
+            room.emit('chat', {data: $('#emit_data').val()});
+            return false;
+        });
+        });
+});
 </script>
 </html>

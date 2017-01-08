@@ -2,6 +2,9 @@
 <form method=post action="/register">
   <dl>
     <li>{{ render_field(form.username) }}</li>
+    {% for error in form.username.errors %}
+    <span style="color: red;">{{ error }}</span>
+    {% endfor %}<br>
     {{ render_field(form.email) }}
     {{ render_field(form.password) }}
     {{ render_field(form.confirm) }}
