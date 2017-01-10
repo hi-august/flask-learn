@@ -10,8 +10,7 @@
                 <div class="switch switch-small pull-right" >
                         <input type="checkbox" />
                 </div>
-                    {{format_datetime}}
-                <h3><label>简书热点</label></h3>
+                <h3><label>热点文章</label></h3>
             </caption>
                 <form class="query-form" class="form-horizontal" action="/news" method="GET">
                     <!--一般hidden设置默认的参数-->
@@ -19,11 +18,11 @@
                     {{ macro.input('search-status', type='hidden', value='')}}
                     <div class="row">
                         <div class="form-group col-md-4">
-                            <label for="sourceSite" class="sr-only">Search</label>
+                            <label for="sourceSite">标题搜索</label>
                             <input type="text" class="form-control" id="" placeholder="Search" name="keyword" value="{{condition.keyword}}">
                         </div>
                         <div class="form-group col-md-2">
-                            <label for="sourceSite" class="sr-only">source</label>
+                            <label for="sourceSite">选择哪个网站</label>
                             <select class="form-control" name="source">
                                 <option value="">源站</option>
                                 {% for x in source %}
@@ -33,25 +32,29 @@
                             </select>
                         </div>
                         <div class="form-group  col-md-2">
-                        <label for="sourceSite" class="sr-only">起始日期</label>
+                        <label for="sourceSite">起始日期</label>
+                        <!-- <label for="sourceSite" class="sr-only">起始日期</label> -->
                         <div class="input-group date form_datetime" data-date="" data-date-format="" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
                             <input class="form-control" size="16" type="text" value="{{condition.str_date}}" readonly name="str_date">
                             <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                         </div>
                     </div>
                     <div class="form-group  col-md-2">
-                        <label for="sourceSite" class="sr-only">起始日期</label>
+                        <label for="sourceSite">截至日期</label>
+                        <!-- <label for="sourceSite" class="sr-only">截至日期</label> -->
                         <div class="input-group date form_datetime" data-date="" data-date-format="" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
-                            <input class="form-control" size="16" type="text" value="{{condition.str_date}}" readonly name="str_date">
+                            <input class="form-control" size="16" type="text" value="{{condition.end_date}}" readonly name="end_date">
                             <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                         </div>
                     </div>
-                        <div class="col-md-1 pull-right">
-                            <button type="submit" class="btn btn-primary">查&nbsp;&nbsp;询</button>
-                        </div>
-                        <div class="col-md-1 pull-right">
-                            <button type="submit" name='action' value='导出csv' class="btn btn-primary">导出csv</button>
-                        </div>
+                    <div class="form-group  col-md-1">
+                        <label for="sourceSite">导出</label>
+                        <button type="submit" name='action' value='导出csv' class="btn btn-primary">导出csv</button>
+                    </div>
+                    <div class="form-group  col-md-1">
+                        <label for="sourceSite">查询</label>
+                        <button type="submit" class="btn btn-primary">查&nbsp;&nbsp;询</button>
+                    </div>
                     </div>
                 </form>
             </div>

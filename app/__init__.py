@@ -21,7 +21,7 @@ from logging.handlers import SysLogHandler
 from logging import Formatter, StreamHandler, FileHandler
 
 from flask.ext.mongoengine import MongoEngine
-# from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 from raven.contrib.flask import Sentry
 from redis_session import RedisSessionInterface
 from celery import Celery, platforms
@@ -32,7 +32,7 @@ mail = Mail()
 
 db = MongoEngine()
 db.connect(db='web', connect=False)
-# mysql_db = SQLAlchemy()
+mysql_db = SQLAlchemy()
 
 sentry = Sentry()
 login_manager = LoginManager()
@@ -92,7 +92,7 @@ def setup_app():
     }
     server_type = config_name.split("_")[0]
     app = servers[server_type]()
-    # mysql_db.init_app(app)
+    mysql_db.init_app(app)
     init_celery(app)
     from cache import cache
     cache.init_app(app)

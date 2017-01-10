@@ -103,10 +103,10 @@ class Author(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     is_show = db.Column(db.Boolean, default=True)
     name = db.Column(db.String(40), index=True)
-    posts = db.relationship(
-        'MysqlJianshu',
-        backref='Author',
-    )
+    #  posts = db.relationship(
+        #  'MysqlJianshu',
+        #  backref='Author',
+    #  )
 
     def __unicode__(self):
         return self.name
@@ -114,14 +114,16 @@ class Author(db.Model):
 class MysqlJianshu(db.Model):
     __tablename__ = 'jianshu'
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(60), index=True)
-    author = db.Column(
-        db.String(40),
-        db.ForeignKey('author.name'),
-        nullable=False,
-    )
+    title = db.Column(db.String(200), index=True)
+    url = db.Column(db.String(200), index=True)
+    link_id = db.Column(db.String(32), index=True)
+    #  author = db.Column(
+        #  db.String(40),
+        #  db.ForeignKey('author.name'),
+        #  nullable=False,
+    #  )
     content = db.Column(db.Text)
-    create_time = db.Column(db.DateTime, default=dte.now())
+    update_datetime = db.Column(db.DateTime, default=dte.now())
 
 
 def init_db():
@@ -137,4 +139,5 @@ def save(p):
     # Book.query.filter_by().all() 返回一个列表
     # first()
     db.session.add(p)
-    db.session.commit()
+    res = db.session.commit()
+    return res

@@ -4,7 +4,7 @@ import os
 import zipfile
 
 from app import setup_app, db
-from flask.ext.script import Manager, Shell
+from flask.ext.script import Manager, Shell, Server
 from datetime import datetime as dte
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -16,6 +16,8 @@ def make_shell_context():
     return dict(app=app, db=db, m=m)
 
 manager.add_command("shell", Shell(make_context=make_shell_context))
+
+manager.add_command("runserver", Server(host="0.0.0.0", port=5000, use_debugger=True))
 
 
 @manager.command

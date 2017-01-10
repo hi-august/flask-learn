@@ -115,11 +115,13 @@ def get_news(url):
 @dashboard.route('/news/', methods=['GET'])
 # @login_required
 # 缓存
-@cache.cached(timeout=300, key_prefix=make_cache_key, unless=None)
+# @cache.cached(timeout=300, key_prefix=make_cache_key, unless=None)
 def get_news_list():
     params = request.values.to_dict()
     source = params.get('source', '')
     keyword = params.get('keyword', '')
+    str_date = params.get('str_date', '')
+    end_date = params.get('end_date', '')
     queryset = {}
     # access_log.info(current_user.username)
     # access_log.info(session.viewitems())
@@ -129,13 +131,18 @@ def get_news_list():
     # access_log.info(request.cookies)
     if keyword:
         queryset.update(title__icontains=keyword)
-
     if source:
         queryset.update(source=source)
+    if str_date:
+        queryset.update(update_datetime__gte=str_date)
+    if end_date:
+        queryset.update(update_datetime__lte=end_date)
     action = params.get("action", "查询")
 
     # 导出csv, 这里可以为响应流(yield)生成
     if action == "导出csv":
+        if current_user.is_anonymous:
+            return redirect(url_for('dashboard.login'))
         qs = Jianshu.objects.filter(**queryset)
         t1 = time.time()
         access_log.info("start export order, %s, condition:%s", current_user.username, request.values.to_dict())
