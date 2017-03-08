@@ -2,6 +2,7 @@
 
 from app import db
 from datetime import datetime as dte
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 class Category(db.Document):
     name = db.StringField(required=True)
@@ -89,6 +90,23 @@ class AdminUser(db.Document):
     """
     后台管理员/客服
     """
+    # token生成
+    def generate_auth_token(self, expiration = 600):
+        s = Serializer(app.config['SECRET_KEY'], expires_in = expiration)
+        return s.dumps({ 'id': self.id })
+
+    @staticmethod
+    def verify_auth_token(token):
+        s = Serializer(app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except SignatureExpired:
+            return None # valid token, but expired
+        except BadSignature:
+            return None # invalid token
+        user = User.query.get(data['id'])
+        return user
+
     username = db.StringField(max_length=30)
     password = db.StringField(max_length=50)
     create_datetime = db.DateTimeField(default=dte.now)

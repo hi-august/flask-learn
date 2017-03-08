@@ -3,12 +3,30 @@
 from app.api import api
 from app.models import News, AdminUser
 from app import access_log
+from app.utils import md5
 
 from flask import Flask, jsonify, abort, make_response, request
 from flask.ext.login import login_required
 
 from flask.ext.httpauth import HTTPBasicAuth
 auth = HTTPBasicAuth()
+
+# 验证密码
+@auth.verify_password
+def verify_password(username_or_token, password):
+    user = AdminUser.objects(username=username_or_token).first()
+    if user.password == md5(password):
+        return True
+    return False
+
+# 需要登录权限
+# @auth.get_password
+# def get_password(username):
+    # user = AdminUser.objects(username=username).first()
+    # print username, user.password
+    # if user:
+        # return user.password
+    # return None
 
 @api.route('/users', methods=['GET'])
 def get_users():
@@ -26,12 +44,6 @@ def get_news():
         out.append({x['title']: x['url']})
     return jsonify({'news': out})
 
-# 需要登录权限
-@auth.get_password
-def get_password(username):
-    if username in ['august', 'nana']:
-        return 'ok'
-    return None
 
 @auth.error_handler
 def unauthorized():
@@ -91,9 +103,19 @@ def create_task():
     return jsonify({'task': task}), 201
 
 @api.route('/test', methods=['GET'])
+@auth.login_required
 def test():
     return jsonify({'code': 'ok'})
 
+@api.route('/api/v1/check', methods=['GET'])
+@auth.login_required
+def check():
+    realip = request.environ['REMOTE_ADDR']
+    access_log.info('[check ok ip: %s]'%realip)
+    return jsonify({
+        'code': 1,
+        'message': 'ok',
+    })
 # 404处理
 # @app.errorhandler(404)
 # def not_found(error):
