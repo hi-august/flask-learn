@@ -6,8 +6,12 @@ flask exercises
 werkzeug是一个wsgi工具包,作为一个web框架的底层库
 jinjia2是一个功能齐全的模板引擎
 2. RESTful api, 即(Resource Representational State Transfer)
-简单说就是url来定位资源, 用HTTP动词(GET,POST,PUT,DELETE)来对资源进行操作
+2.1 每一个url代表一种资源
+2.2 客服端和服务端传递资源
+2.3 客户端通过http动词对服务器资源进行操作
+2.4 简单说就是url来定位资源, 用HTTP动词(GET,POST,PUT,DELETE)来对资源进行操作
 一般来说,GET获取资源,POST添加(也可以用来更新资源),PUT更新,DELETE删除资源
+2.5 无状态,统一接口,表现层,分层系统,状态转变
 3. WSGI(web server gateway interface), 是python语言来定义web服务器和web应用程序
 的接口,它封装了http请求,解析http请求,发送http请求,响应等底层操作
 4. Flask中分为请求上下文(Request,Session), 和应用上下文(g,current_app)

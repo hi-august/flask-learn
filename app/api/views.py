@@ -1,11 +1,12 @@
 # coding=utf-8
 
 from app.api import api
-from app.models import News, AdminUser
+from app.models import News, AdminUser, Jianshu
 from app import access_log
 from app.utils import md5
+import math
 
-from flask import Flask, jsonify, abort, make_response, request
+from flask import Flask, jsonify, abort, make_response, request, g
 from flask.ext.login import login_required
 
 from flask.ext.httpauth import HTTPBasicAuth
@@ -14,10 +15,15 @@ auth = HTTPBasicAuth()
 # 验证密码
 @auth.verify_password
 def verify_password(username_or_token, password):
-    user = AdminUser.objects(username=username_or_token).first()
-    if user.password == md5(password):
-        return True
-    return False
+    try:
+        user = AdminUser.objects(username=username_or_token).first()
+        if user.password == md5(password):
+            # 存储g.user
+            # g.user = user.username
+            return True
+        return False
+    except:
+        return False
 
 # 需要登录权限
 # @auth.get_password
@@ -27,6 +33,31 @@ def verify_password(username_or_token, password):
     # if user:
         # return user.password
     # return None
+
+def parse_page_data(qs):
+    total = qs.count()
+    params = request.values.to_dict()
+    try:
+        page = int(params.get("page"))
+    except TypeError:
+        page = 1
+    if page < 1:
+        page = 1
+    page_size = int(params.get("page_size", 20))
+    page_num = int(math.ceil(total*1.0/page_size))
+    skip = (page-1)*page_size
+
+    cur_range = range(max(1, page-8),  min(max(1, page-8)+16, page_num+1))
+    return {
+        "total": total,
+        "page_size": page_size,         # 每页page_size条记录
+        "page_count": page_num,         # 总共有page_num页
+        "cur_page": page,               # 当前页
+        "previous": max(0, page-1),
+        "next": min(page+1, page_num),
+        "items": qs[skip: skip+page_size],
+        "range": cur_range,             # 分页按钮显示的范围
+    }
 
 @api.route('/users', methods=['GET'])
 def get_users():
@@ -112,9 +143,13 @@ def test():
 def check():
     realip = request.environ['REMOTE_ADDR']
     access_log.info('[check ok ip: %s]'%realip)
+    # 分页
+    # posts = Jianshu.objects()
+    # ret = parse_page_data(posts)
     return jsonify({
         'code': 1,
         'message': 'ok',
+        # 'data': ret,
     })
 # 404处理
 # @app.errorhandler(404)
