@@ -5,7 +5,7 @@ from datetime import datetime as dte
 
 class User(db.Model):
     __tablename__ = 'user'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(20))
 
     def __unicode__(self):
@@ -19,7 +19,7 @@ class User(db.Model):
 # 添加记录 Book(name='hi', user=User(username='august')
 class Book(db.Model):
     __tablename__ = 'book'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(20))
     # 外键的字段
     user_id = db.Column(
@@ -38,7 +38,7 @@ class Book(db.Model):
 
 
 class Category(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(50))
 
     def __init__(self, name):
@@ -48,7 +48,7 @@ class Category(db.Model):
         return '<Category %r>' % self.name
 
 class Comment(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(200))
     pub_date = db.Column(db.DateTime, default=dte.now())
 
@@ -58,7 +58,7 @@ class Comment(db.Model):
 class Post(db.Model):
     """ 定义了五个字段，分别是 id，title，body，pub_date，category_id
     """
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(80))
     content = db.Column(db.Text)
     pub_date = db.Column(db.DateTime, default=dte.now())
@@ -78,11 +78,6 @@ class Post(db.Model):
         return '<Post %r>' % self.title
 
     def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-
-    def modify(self):
         db.session.add(self)
         db.session.commit()
 
