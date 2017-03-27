@@ -41,6 +41,7 @@ class Config:
 
     # flask-sqlalchemy配置
     SQLALCHEMY_DATABASE_URI = 'mysql://root:Cxk!51789@localhost/web'
+    SQLALCHEMY_ECHO = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     # scrapyd 地址
     SCRAPYD_URLS = [

@@ -58,6 +58,11 @@ class Comment(db.Model):
 class Post(db.Model):
     """ 定义了五个字段，分别是 id，title，body，pub_date，category_id
     """
+    __tablename__ = 'post'
+    __table_args__ = {
+        'mysql_engine': 'MyISAM', # InnoDB,存储引擎
+        'mysql_charset': 'utf8'
+    }
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(80))
     content = db.Column(db.Text)
