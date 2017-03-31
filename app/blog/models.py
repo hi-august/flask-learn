@@ -1,5 +1,7 @@
 # coding=utf-8
 
+# http://blog.csdn.net/jmilk/article/details/53239740
+# http://blog.csdn.net/u011573853/article/details/51355113
 from app import mysql_db as db
 from datetime import datetime as dte
 
@@ -183,12 +185,31 @@ def save(p):
     # first()
     # session是为了保证数据库的一致性,
     # 提交数据使用原子方式把会话对象写入数据库
+
     # 事务用来处理量大,复杂度高的数据
     # 数据库事务具有以下四个特性
     # 1.原子性,一个事务的所有操作,要么全部完成,要么全部不完成
     # 2. 一致性(稳定性),有非法数据(外键约束),事务返回
     # 3. 隔离性,事务独立运行,一个事务如果影响到其他事务,其他事务会撤回
     # 4. 持久性,软硬件崩溃,innodb会根据日志进行重构修改
+
+    # inner join, left join, right join
+    # left join(左连接),以左边的表为主,左边表全部列出,右表分为以下三种,
+    # 1.右表有一条,会返回新的一条记录
+    # 2.右表有n条记录,会返回n条新的记录
+    # 3.右表没有可以null列出
+    # right join(右连接),右边的表全部列出,左表分以下三种情况,
+    # 1.左表有一条记录,会返回新的一条记录
+    # 2.左表有n条记录,会返回新的n条记录
+    # 3.左表没有记录,可以用null填充
+    # inner join(内连接)(join), 相当于交集
+    # 左表和右表都匹配到返回
+    # full join(完全连接), 相当于并集
+    # 左表或右表匹配到都返回
+
+    # 高并发下可以加锁,以免数据冲突
+    # u = User.query.with_lockmode('update').filter_by(username='august').first()
+    # u.query.update({'username': 'h1'})
 
     try:
         db.session.add(p)
