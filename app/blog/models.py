@@ -183,11 +183,29 @@ def reset():
     db.session.rollback()
 
 def save(p):
-    # add_all添加列表 add()
-    # Book.query.filter().delete()
+    # add_all添加列表,不用手动commit
+
+    # add()
+    # User.query.filter_by(username='2').order_by('username desc', 'id').group_by('username').all()
+    # User.query.filter('username != 2').all()
+    # User.query.filter('username like 2').offset(0).limit(5).all()
+
+    # Book.query.filter().delete() 删除匹配到数据
     # Book.query.filter().update() b.name = 'war and peace' save(b)
-    # Book.query.filter_by().all() 返回一个列表
-    # first()
+    # 查询过滤器
+    # filter把查询过滤器添加到原查询
+    # Book.query.filter_by().all() 把等值过滤器添加到原查询, 返回一个列表
+    # group_by 对结果进行分组排序
+    # order_by 排序返回结果
+
+    # all() 返回一个列表
+    # first() 第一个匹配到数据,没有返回None
+    # limit(2) 限制返回结果数
+    # offset() 返回偏移的结果
+    # get() 返回主键对应的记录
+    # count() 返回匹配到结果数量
+    # paginate() 返回分页对象
+
     # session是为了保证数据库的一致性,
     # 提交数据使用原子方式把会话对象写入数据库
 
