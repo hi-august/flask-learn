@@ -8,7 +8,8 @@ from datetime import datetime as dte
 class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20))
+    username = db.Column(db.String(20), unique=True, index=True)
+    password = db.Column(db.String(30))
 
     def __unicode__(self):
         return self.username
@@ -69,9 +70,11 @@ class Post(db.Model):
     """
     __tablename__ = 'post'
     __table_args__ = {
-        'mysql_engine': 'MyISAM', # InnoDB,存储引擎
+        'mysql_engine': 'MyISAM', # InnoDB,存储引擎, MyISAM类型的表强调性能,但是不支持事务
         'mysql_charset': 'utf8'
     }
+    # myisam和innodb存储引擎主要区别在于,是否支持事务
+    # myisam适合用于读多写,innodb适合用于事务
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(80))
