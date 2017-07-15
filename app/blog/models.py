@@ -237,6 +237,9 @@ def save(p):
     # u = User.query.with_lockmode('update').filter_by(username='august').first()
     # u.query.update({'username': 'h1'})
 
+    # 对于访问数据库来说,建立连接的代价比较昂贵,
+    # 我们可以建立mysql'连接池'提高访问的性能
+
     try:
         db.session.add(p)
     except Exception as e:
